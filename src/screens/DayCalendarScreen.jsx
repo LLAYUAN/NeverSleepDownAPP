@@ -1,8 +1,13 @@
 import React from 'react';
-import {Text} from 'react-native';
+import {Text,View} from 'react-native';
 import WeekCalendar from '../component/WeekCalendar';
-export default function DayCalendarScreen(){
+import TopBar from '../component/TopBar';
+export default function DayCalendarScreen({ navigation }){
     return(
+    <View>
+        <TopBar navigation={navigation}/>
         <WeekCalendar/>
+    </View>
+
     )
 }

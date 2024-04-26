@@ -1,54 +1,57 @@
 import React, { useState } from 'react';
-import { ScrollView, View, Dimensions, Text } from 'react-native';
-import { Calendar } from 'react-native-calendars';
+import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { format, startOfWeek, addDays } from 'date-fns';
 
-const { width } = Dimensions.get('window'); // 获取屏幕宽度
+const WeekCalendar = () => {
+  const [selectedDate, setSelectedDate] = useState(new Date());
 
-function WeekCalendar() {
-  // 假设我们有一个函数来计算当前周的日期并标记它们
-  // 当前日期
-  const [current, setCurrent] = useState('2024-03-15');
+  const startWeek = startOfWeek(new Date(), { weekStartsOn: 1 }); // Week starts on Monday
+  const days = new Array(7).fill(null).map((_, i) => addDays(startWeek, i));
 
-  // 标记一周的日期，这需要逻辑来生成周日期的标记
-  const markedDates = {
-    '2024-03-12': { selected: true, selectedColor: 'red' },
-    // ... 其他日期
+  const Day = ({ date }) => {
+    const isSelected = format(date, 'yyyy-MM-dd') === format(selectedDate, 'yyyy-MM-dd');
+    const isToday = format(date, 'yyyy-MM-dd') === format(new Date(), 'yyyy-MM-dd');
+    return (
+      <TouchableOpacity
+        style={[styles.dayContainer, isSelected ? styles.selectedDay : isToday ? styles.today : null]}
+        onPress={() => setSelectedDate(date)}
+      >
+        <Text style={styles.dayText}>{format(date, 'EEE')}</Text>
+        <Text style={styles.dateText}>{format(date, 'd')}</Text>
+      </TouchableOpacity>
+    );
   };
 
   return (
-    <ScrollView
-      horizontal
-      pagingEnabled
-      showsHorizontalScrollIndicator={false}
-      style={{ width: width }}
-      contentContainerStyle={{ width: `${7 * 100}%` }} // 7天，每天一个屏幕宽度
-      onScroll={(event) => {
-        // 通过滑动事件更新当前日期状态
-      }}
-    >
-      {[...Array(7)].map((_, i) => ( // 生成7个日历视图，每个表示一周
-        <View key={i} style={{ width: width, height: '100%' }}>
-          <Calendar
-            // ... 其他你需要的props
-            current={current}
-            markedDates={markedDates}
-            markingType={'period'}
-            // 显示一周
-            theme={{
-              'stylesheet.day.period': {
-                base: {
-                  overflow: 'hidden',
-                  height: 34,
-                  alignItems: 'center',
-                  width: 38,
-                },
-              },
-            }}
-          />
-        </View>
+    <View style={styles.container}>
+      {days.map((date, index) => (
+        <Day key={index} date={date} />
       ))}
-    </ScrollView>
+    </View>
   );
-}
+};
+
+const styles = StyleSheet.create({
+  container: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  dayContainer: {
+    alignItems: 'center',
+    padding: 10,
+  },
+  selectedDay: {
+    backgroundColor: '#FFCCCC',
+  },
+  today: {
+    backgroundColor: '#CCCCCC',
+  },
+  dayText: {
+    fontSize: 14,
+  },
+  dateText: {
+    fontSize: 18,
+  },
+});
 
 export default WeekCalendar;
