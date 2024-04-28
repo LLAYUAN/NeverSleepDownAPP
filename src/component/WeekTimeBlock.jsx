@@ -1,0 +1,48 @@
+import React from 'react';
+import { TouchableOpacity, Text, StyleSheet } from 'react-native';
+
+const WeekTimeBlock = ({ block, onPress }) => {
+  const blockStyle = block.type === 'class' ? styles.classBlock : styles.eventBlock;
+
+  const topPosition = block.startTime * 60+30; // 假设每小时高度为60单位
+  const leftPosition = block.weekday*50-5;
+  const blockHeight = (block.endTime - block.startTime) * 60; // 持续时间转换为高度
+
+  return (
+    <TouchableOpacity style={[styles.block, blockStyle,{ left: leftPosition, top: topPosition, height: blockHeight}]} onPress={onPress}>
+      <Text style={styles.name}>{block.name}</Text>
+      <Text style={styles.location}>{block.location}</Text>
+    </TouchableOpacity>
+  );
+};
+//todo：块太小文字怎么显示，块重叠怎么显示
+const styles = StyleSheet.create({
+  block: {
+    position: 'absolute', // 这将使组件能够放置在ScrollView的正确位置
+    justifyContent: 'start',
+    padding: 10,
+    borderRadius: 5, // 圆角
+    width:50,
+    overflow: 'hidden', // 设置溢出部分隐藏
+  },
+  classBlock: {
+    backgroundColor: '#002FA790',
+  },
+  eventBlock: {
+    backgroundColor: '#F1632690',
+  },
+  name: {
+    fontWeight: 'bold',
+    color: 'white',
+  },
+  location: {
+    fontSize:12,
+    color: 'white',
+  },
+  time: {
+    fontSize:10,
+    color: 'white',
+  },
+});
+
+export default WeekTimeBlock;
