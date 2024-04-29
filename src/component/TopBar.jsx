@@ -40,6 +40,7 @@ const handleRenderPress = (index) => {
 
         <TouchableOpacity
           style={styles.squareStyle}
+            onPress={() => navigation.navigate('Add')}
         >
            <Image source={require('../image/add.png')} style={styles.icon}/>
         </TouchableOpacity>

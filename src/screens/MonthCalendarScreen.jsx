@@ -1,13 +1,14 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, Dimensions } from 'react-native';
 import { Calendar } from 'react-native-calendars';
+import TopBar from '../component/TopBar';
 
 const { width } = Dimensions.get('window');
 
 //todo:获取每个日期的 重要，休息，工作，事件状态
 const dayState={star:true,rest:false,work:true,class:true,event:true};
 
-const MonthCalendarScreen = () => {
+const MonthCalendarScreen = ({navigation}) => {
     const today = new Date().toISOString().split('T')[0]; // Get today's date in YYYY-MM-DD format
     const lunarDates = (date) => {
         // todo：日期和阴历的转换
@@ -41,6 +42,7 @@ const MonthCalendarScreen = () => {
 
   return (
     <View style={styles.container}>
+      <TopBar navigation={navigation} active={2}/>
       <Calendar
         dayComponent={({ date, state }) => {
             const lunarDay = lunarDates(date.dateString);

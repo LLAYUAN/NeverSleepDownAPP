@@ -10,6 +10,7 @@ import DayCalendarScreen from './src/screens/DayCalendarScreen';
 import RegisterScreen from './src/screens/RegisterScreen';
 import MonthCalendarScreen from './src/screens/MonthCalendarScreen';
 import WeekCalendarScreen from './src/screens/WeekCalendarScreen';
+import AddScreen from './src/screens/AddScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -23,6 +24,7 @@ function App() {
         <Stack.Screen name="Day" component={DayCalendarScreen} />
         <Stack.Screen name="Week" component={WeekCalendarScreen} />
         <Stack.Screen name="Month" component={MonthCalendarScreen} />
+        <Stack.Screen name="Add" component={AddScreen} />
 
       </Stack.Navigator>
     </NavigationContainer>

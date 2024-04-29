@@ -24,7 +24,7 @@ const updateWeek = (direction) => {
 {/*         todo:根据选择日期计算第几周 */}
             <Text style={styles.weekText}>第三周</Text>
 {/*              todo:选择日期直接进入日视图 */}
-            <WeekCalendar selectedDate={selectedDate} currentWeekStart={currentWeekStart} setSelectedDate={setSelectedDate} updateWeek={updateWeek}/>
+            <WeekCalendar navigation={navigation} navigation={navigation}selectedDate={selectedDate} currentWeekStart={currentWeekStart} setSelectedDate={setSelectedDate} updateWeek={updateWeek}/>
         </View>
 {/* todo:根据选择日期调出当天的事件绘制timeline */}
         <TimeLine selectedDate={selectedDate} type={'week'}/>

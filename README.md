@@ -81,4 +81,10 @@ To learn more about React Native, take a look at the following resources:
 ```bash
 yarn add react-native-elements react-native-vector-icons
 yarn add react-native-gesture-handler
+yarn add @react-native-picker/picker
+yarn add @react-native-community/datetimepicker
+yarn add react-native-datepicker
+npm install @react-native-community/datetimepicker --save
+yarn add react-native-modal-datetime-picker
+yarn add react-native-modal
 ```

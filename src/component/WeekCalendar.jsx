@@ -3,9 +3,15 @@ import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { format, startOfWeek, addDays, subWeeks, addWeeks } from 'date-fns';
 import { GestureHandlerRootView, Swipeable } from 'react-native-gesture-handler';
 
-const WeekCalendar = ({selectedDate,currentWeekStart,setSelectedDate,updateWeek}) => {
-
+const WeekCalendar = ({navigation,selectedDate,currentWeekStart,setSelectedDate,updateWeek}) => {
+  console.log('WeekCalendar',selectedDate);
   const days = new Array(7).fill(null).map((_, i) => addDays(currentWeekStart, i));
+
+  const handlePressDay= (date) => {
+  //  setSelectedDate(date);
+  const selectDayStr = date.toISOString();
+    navigation.navigate('Day', { selectDay: selectDayStr });
+  }
 
   const Day = ({ date }) => {
     const isSelected = format(date, 'yyyy-MM-dd') === format(selectedDate, 'yyyy-MM-dd');
@@ -13,7 +19,7 @@ const WeekCalendar = ({selectedDate,currentWeekStart,setSelectedDate,updateWeek}
     return (
       <TouchableOpacity
         style={[styles.dayContainer, isSelected ? styles.selectedDay : isToday ? styles.today : null]}
-        onPress={() => setSelectedDate(date)}
+        onPress={() => {handlePressDay(date)}}
       >
         <Text style={styles.dayText}>{format(date, 'EEE')}</Text>
         <Text style={styles.dateText}>{format(date, 'd')}</Text>
