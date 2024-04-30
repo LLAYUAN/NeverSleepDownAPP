@@ -12,47 +12,15 @@ const ProfileScreen = ({ navigation }) => {
     navigation.navigate('Home');
   };
 
-  //todo：获得当前使用的工作表名称（应该是一个全局的维护变量）
-  const [selectedTable, setSelectedTable] = useState('默认工作表');
+//todo:从后端获取用户信息进行初始化
+  const [userId, setUserId] = useState('188888888888');
+  const [name, setName] = useState('12321hh');
+  const [gender, setGender] = useState('女');
+  const [location, setLocation] = useState('上海');
 
-  //todo:获取并初始化课程块和日程块颜色（感觉可以是一个全局维护的变量）
-  const [courseColor, setCourseColor] = useState('#002FA7');
-  const [modalCourseVisible, setModalCourseVisible] = useState(false);
-  const [eventColor, setEventColor] = useState('#F16326');
-  const [modalEventVisible, setModalEventVisible] = useState(false);
 
-    const handleCourseColorChange = (color) => {
-        setCourseColor(color);
-    };
-    const handleEventColorChange = (color) => {
-        setEventColor(color);
-
-    };
-
-//todo:上传背景图片
-    const handleUpload = () => {};
-
-//todo：这里应该是获取到的当前工作表的第一天
-  const [date, setDate] = useState(new Date());
-  const [show, setShow] = useState(false);
-  const [dateText, setDateText] = useState(date.toDateString());
-
-  const onChange = (event, selectedDate) => {
-    const currentDate = selectedDate || date;
-    setShow(Platform.OS === 'ios');
-    setDate(currentDate);
-    //todo: 日期显示形式
-
-    setDateText(currentDate.toDateString()); // 更新文本以显示选择的日期
-  };
-  const showMode = () => {
-    setShow(true);
-  };
-
-////todo：这里应该是获取到的当前工作表的周数
-  const [selectedWeek, setSelectedWeek] = useState(16);
-  const weeks = Array.from({ length: 20 }, (_, i) => i + 1);
-
+//todo:处理更改头像逻辑
+  const handleUploadImg=()=>{}
 
   return (
   <LinearGradient colors={['#72C4FF80', '#FF9E9E80']} style={styles.container}>
@@ -60,100 +28,76 @@ const ProfileScreen = ({ navigation }) => {
         <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
             <Text style={{fontSize:12,color:'white'}}>返回</Text>
         </TouchableOpacity>
-        <Text style={styles.title}>个性化设置</Text>
-        <View style={{ width: 48 }} />
+        <TouchableOpacity style={[styles.backButton,{backgroundColor:'#F16326'}]} onPress={() => handleFinish()}>
+            <Text style={{fontSize:12,color:'white'}}>完成</Text>
+        </TouchableOpacity>
       </View>
 
-    <View style={{height:20}}></View>
-    <View style={styles.selectContainer}>
-      <Text style={styles.titleText}>{selectedTable}</Text>
-    </View>
-
-    <View style={{height:30}}></View>
-{/* todo：上传背景图片    */}
-    <View style={styles.selectContainer}>
-      <Text style={styles.titleText}>工作表背景</Text>
-      <TouchableOpacity onPress={handleUpload} style={[styles.select,{justifyContent:'center'}]} >
-              <Image source={require('../image/upload.png')} style={styles.icon}/>
+      <TouchableOpacity onPress={handleUploadImg} style={{justifyContent:'center',alignItems:'center',margin:30}}>
+        <Image source={require('../image/tx.png')} style={{width:100,height:100,borderRadius:50}}/>
       </TouchableOpacity>
-    </View>
 
     <View style={styles.selectContainer}>
-      <Text style={styles.titleText}>课程块颜色</Text>
-      <TouchableOpacity onPress={() => setModalCourseVisible(true)} style={[styles.select,{justifyContent:'center'}]} >
-              <Text style={[{color:courseColor},styles.colorText]}>{courseColor} </Text>
-              <Image source={require('../image/select.png')} style={styles.icon}/>
-      </TouchableOpacity>
-      <ColorPickerModal
-            isVisible={modalCourseVisible}
-            onClose={() => setModalCourseVisible(false)}
-            onSelect={handleCourseColorChange}
-            defaultColor={courseColor}
+      <Text style={styles.titleText}>账户名</Text>
+      <TextInput
+        editable={false}
+        style={styles.input}
+        placeholder="地点"
+        value={userId}
       />
     </View>
 
+    <View style={{height:40}}/>
     <View style={styles.selectContainer}>
-      <Text style={styles.titleText}>日程块颜色</Text>
-      <TouchableOpacity onPress={() => setModalEventVisible(true)} style={[styles.select,{justifyContent:'center'}]} >
-              <Text style={[{color:eventColor},styles.colorText]}>{eventColor} </Text>
-              <Image source={require('../image/select.png')} style={styles.icon}/>
-      </TouchableOpacity>
-      <ColorPickerModal
-            isVisible={modalEventVisible}
-            onClose={() => setModalEventVisible(false)}
-            onSelect={handleEventColorChange}
-            defaultColor={eventColor}
+      <Text style={styles.titleText}>昵称</Text>
+      <TouchableOpacity style={styles.select}>
+      <TextInput
+        style={styles.input}
+        placeholder="昵称"
+        onChangeText={setName}
+        value={name}
       />
-    </View>
-
-    <View style={{height:30}}></View>
-
-    <View style={styles.selectContainer}>
-      <Text style={styles.titleText}>日期</Text>
-      <TouchableOpacity onPress={showMode} style={styles.select}>
-        <Text style={{color:'black'}}>{dateText}</Text>
-        <Image source={require('../image/select.png')} style={styles.icon}/>
+      <Image source={require('../image/select.png')} style={styles.icon}/>
       </TouchableOpacity>
-      {show && (
-        <DateTimePicker
-          testID="dateTimePicker"
-          value={date}
-          mode="date"
-          is24Hour={true}
-          display="default"
-          onChange={onChange}
-        />
-      )}
     </View>
+
     <View style={styles.selectContainer}>
-      <Text style={styles.titleText}>周数</Text>
+      <Text style={styles.titleText}>性别</Text>
       <Picker
-        selectedValue={selectedWeek}
-        onValueChange={(itemValue, itemIndex) => setSelectedWeek(itemValue)}
-        style={[styles.select,{width: 100}]}
+        selectedValue={gender}
+        onValueChange={itemValue => setGender(itemValue)}
+        style={{ width: 120 ,color:'black'}}
       >
-        {weeks.map((week) => (
-          <Picker.Item key={week} label={`${week}`} value={week} />
-        ))}
+        <Picker.Item label="女" value="女" />
+        <Picker.Item label="男" value="男" />
       </Picker>
     </View>
 
-    <View style={{height:30}}></View>
-
-    <View style={[styles.selectContainer,{justifyContent:'center'}]}>
-      <TouchableOpacity onPress={() => navigation.navigate('TimeSetting')} style={[styles.select,{justifyContent:'center'}]} >
-          <Text style={styles.titleText}> 上课时间 </Text>
-          <Image source={require('../image/select.png')} style={styles.icon}/>
+    <View style={styles.selectContainer}>
+      <Text style={styles.titleText}>属地</Text>
+      <TouchableOpacity style={styles.select}>
+      <TextInput
+        style={styles.input}
+        placeholder="属地"
+        onChangeText={setLocation}
+        value={location}
+      />
+      <Image source={require('../image/select.png')} style={styles.icon}/>
       </TouchableOpacity>
     </View>
 
-    <View style={{height:30}}></View>
-
+    <View style={{height:70}}/>
       <View style={styles.buttonContainer}>
-        <TouchableOpacity style={styles.button} onPress={handleFinish}>
-            <Text style={styles.buttonText}>保存</Text>
+        <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('ChangeSecret')}>
+            <Text style={styles.buttonText}>修改密码</Text>
         </TouchableOpacity>
       </View>
+      <View style={styles.buttonContainer}>
+        <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Login')}>
+            <Text style={styles.buttonText}>退出登录</Text>
+        </TouchableOpacity>
+      </View>
+
 
     </LinearGradient>
   );
@@ -197,7 +141,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: 30,
+    marginTop: 10,
   },
   button: {
     backgroundColor: '#002FA7', // 按钮背景颜色
@@ -251,6 +195,14 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         marginLeft: 20,
     },
+  input: {
+    height: 45,
+    marginVertical: 10,
+    marginRight: 20,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 10,
+    color: 'black',
+  },
 });
 
 export default ProfileScreen;

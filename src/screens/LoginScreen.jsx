@@ -54,7 +54,7 @@ const LoginScreen = ({ navigation }) => {
               <TouchableOpacity onPress={() => navigation.navigate('Register')}>
                   <Text style={styles.footerText}>立即注册</Text>
               </TouchableOpacity>
-              <TouchableOpacity onPress={() => navigation.navigate('secret')}>
+              <TouchableOpacity onPress={() => navigation.navigate('ForgetSecret')}>
                   <Text style={styles.footerText}>忘记密码</Text>
              </TouchableOpacity>
       </View>

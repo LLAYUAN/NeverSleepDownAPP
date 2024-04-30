@@ -17,6 +17,8 @@ import ExchangeScreen from './src/screens/ExchangeScreen';
 import SettingScreen from './src/screens/SettingScreen';
 import TimeSettingScreen from './src/screens/TimeSettingScreen';
 import ProfileScreen from './src/screens/ProfileScreen';
+import ChangeSecretScreen from './src/screens/ChangeSecretScreen';
+import ForgetSecretScreen from './src/screens/ForgetSecretScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -37,6 +39,8 @@ function App() {
         <Stack.Screen name="Setting" component={SettingScreen}/>
         <Stack.Screen name="TimeSetting" component={TimeSettingScreen}/>
         <Stack.Screen name="Profile" component={ProfileScreen}/>
+        <Stack.Screen name="ChangeSecret" component={ChangeSecretScreen}/>
+        <Stack.Screen name="ForgetSecret" component={ForgetSecretScreen}/>
 
       </Stack.Navigator>
     </NavigationContainer>

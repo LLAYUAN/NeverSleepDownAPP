@@ -26,7 +26,7 @@ const MonthCalendarScreen = ({navigation}) => {
     const dayContainerStyle = (dateString === today) ? [styles.dayContainer, styles.currentDayContainer] : styles.dayContainer;
 
     return (
-      <TouchableOpacity onPress={() => {}} style={dayContainerStyle}>
+      <TouchableOpacity onPress={() => {navigation.navigate('Day',{selectDay:dateString})}} style={dayContainerStyle}>
         {dayState.star && <Text style={styles.starStyle}>★</Text>}
         <Text style={styles.dayText}>{dayNumber}</Text>
         {dayState.rest && <Text style={styles.iconStyle}>休</Text>}

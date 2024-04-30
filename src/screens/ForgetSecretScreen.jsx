@@ -3,13 +3,13 @@ import { StyleSheet, View, TextInput, Button, Text,TouchableOpacity } from 'reac
 import LinearGradient from 'react-native-linear-gradient';
 
 
-const RegisterScreen = ({ navigation }) => {
+const ForgetSecretScreen = ({ navigation }) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
 
-//todo:处理完成注册逻辑，两遍密码是否一样
-  const handleRegister = () => {
+//todo:处理完成忘记逻辑
+  const handleFinish = () => {
 
     navigation.navigate('Home');
   };
@@ -42,7 +42,7 @@ const RegisterScreen = ({ navigation }) => {
 
 
       <View style={styles.buttonContainer}>
-        <TouchableOpacity style={styles.button} onPress={handleRegister}>
+        <TouchableOpacity style={styles.button} onPress={handleFinish}>
             <Text style={styles.buttontext}>注 册</Text>
         </TouchableOpacity>
       </View>
@@ -51,8 +51,8 @@ const RegisterScreen = ({ navigation }) => {
               <TouchableOpacity onPress={() => navigation.navigate('Login')}>
                   <Text style={styles.footerText}>登录</Text>
               </TouchableOpacity>
-              <TouchableOpacity onPress={() => navigation.navigate('ForgetSecret')}>
-                  <Text style={styles.footerText}>忘记密码</Text>
+              <TouchableOpacity onPress={() => navigation.navigate('Register')}>
+                  <Text style={styles.footerText}>注册</Text>
              </TouchableOpacity>
       </View>
       </View>
@@ -156,4 +156,4 @@ const styles = StyleSheet.create({
 
 });
 
-export default RegisterScreen;
+export default ForgetSecretScreen;
