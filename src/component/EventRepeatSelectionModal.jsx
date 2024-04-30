@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Modal, View, Text, TouchableOpacity, Button ,StyleSheet,ScrollView} from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 
-const TableSelectionModal = ({ isVisible, onClose, onSelect }) => {
+const TableSelectionModal = ({ isEdit,isVisible, onClose, onSelect }) => {
   const [selectedType, setSelectedType] = useState(0);
 
   const toggleTypeSelection = (type) => {
@@ -30,6 +30,7 @@ const TableSelectionModal = ({ isVisible, onClose, onSelect }) => {
           <View style={styles.container}>
             {types.map((type) => (
               <TouchableOpacity
+                disabled={!isEdit}
                 key={type.id}
                 style={[
                   styles.button,

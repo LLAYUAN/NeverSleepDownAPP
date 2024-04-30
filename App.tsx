@@ -11,6 +11,12 @@ import RegisterScreen from './src/screens/RegisterScreen';
 import MonthCalendarScreen from './src/screens/MonthCalendarScreen';
 import WeekCalendarScreen from './src/screens/WeekCalendarScreen';
 import AddScreen from './src/screens/AddScreen';
+import DetailScreen from './src/screens/DetailScreen';
+import AddTableScreen from './src/screens/AddTableScreen';
+import ExchangeScreen from './src/screens/ExchangeScreen';
+import SettingScreen from './src/screens/SettingScreen';
+import TimeSettingScreen from './src/screens/TimeSettingScreen';
+import ProfileScreen from './src/screens/ProfileScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -25,6 +31,12 @@ function App() {
         <Stack.Screen name="Week" component={WeekCalendarScreen} />
         <Stack.Screen name="Month" component={MonthCalendarScreen} />
         <Stack.Screen name="Add" component={AddScreen} />
+        <Stack.Screen name="Detail" component={DetailScreen}/>
+        <Stack.Screen name="AddTable" component={AddTableScreen}/>
+        <Stack.Screen name="Tiaoxiu" component={ExchangeScreen}/>
+        <Stack.Screen name="Setting" component={SettingScreen}/>
+        <Stack.Screen name="TimeSetting" component={TimeSettingScreen}/>
+        <Stack.Screen name="Profile" component={ProfileScreen}/>
 
       </Stack.Navigator>
     </NavigationContainer>

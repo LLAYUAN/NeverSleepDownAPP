@@ -22,11 +22,11 @@ const AddScreen = ({ navigation }) => {
         <View style={{ width: 48 }} />
       </View>
 
-      <EventEdit/>
+      <EventEdit navigation={navigation} isEdit={true}/>
 
       <View style={styles.buttonContainer}>
         <TouchableOpacity style={styles.button} onPress={handleFinish}>
-            <Text style={styles.buttontext}>完成</Text>
+            <Text style={styles.buttonText}>完成</Text>
         </TouchableOpacity>
       </View>
 
@@ -83,7 +83,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     underlayColor: '#000F37',
   },
-  buttontext: {
+  buttonText: {
     color: '#FFFFFF', // 文本颜色
     fontSize: 16, // 文本大小
     fontWeight: 'bold',

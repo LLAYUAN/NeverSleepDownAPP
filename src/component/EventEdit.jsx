@@ -10,8 +10,8 @@ import TableSelectionModal from './TableSelectionModal';
 import ClassRepeatSelectionModal from './ClassRepeatSelectionModal';
 import EventRepeatSelectionModal from './EventRepeatSelectionModal';
 
-const AddScreen = ({ navigation }) => {
-
+const EventEdit = ({ navigation ,isEdit,course}) => {
+//todo:从数据库获取课程代码
 const courses = [
   { label: 'SE221232', value: 'math' },
   { label: 'SE12333', value: 'physics' },
@@ -19,11 +19,21 @@ const courses = [
   // 更多课程...
 ];
 
-  const [name, setName] = useState('');
-  const [location, setLocation] = useState('');
-  const [isImportant, setImportant] = useState(false);
-  const [eventType, setEventType] = useState('课程');
+  const [name, setName] = useState(course?.eventName || '');
+  const [location, setLocation] = useState(course?.eventLocation || '');
+  const [isImportant, setImportant] = useState(course?.isImportant || false);
 
+  const [eventType, setEventType] = useState(() => {
+    if (course) {
+      return course.eventType===true ? "课程" : "日程";
+    } else {
+      return "课程";  // 如果没有 course 对象，缺省值为 "课程"
+    }
+  });
+
+//todo:如果有传进来course这个参数，就用course里的数据，否则用默认数据
+//需要初始化data，selectedStartTime，selectedEndTime，selectedClassesText，selectedTable，selectedClassRepeat，selectedEventRepeat
+//需要用后端数据初始化一下，这里的变量的类型可以看下set的时候set是啥（）
   const [date, setDate] = useState(new Date());
   const [show, setShow] = useState(false);
   const [dateText, setDateText] = useState(date.toDateString());
@@ -51,6 +61,7 @@ const courses = [
     setShow(Platform.OS === 'ios');
     setDate(currentDate);
     //todo: 日期显示形式
+
     setDateText(currentDate.toDateString()); // 更新文本以显示选择的日期
   };
   const showMode = () => {
@@ -93,7 +104,7 @@ const courses = [
     setSelectedClassesText(selectedClasses.join(', '));
   };
 
-//todo:维护一个记录选择了哪个工作表的变量
+//todo:全局维护一个记录选择了哪个工作表的变量
   const handleSelectTable = (selectedTable) => {
     setSelectedTable(selectedTable);
   };
@@ -113,20 +124,22 @@ const courses = [
 
       <TextInput
         style={styles.input}
+        editable={isEdit}
         placeholder="标题"
         value={name}
         onChangeText={setName}
       />
       <TextInput
         style={styles.input}
+        editable={isEdit}
         placeholder="地点"
-        secureTextEntry
         value={location}
         onChangeText={setLocation}
       />
 
       <View style={styles.checkboxContainer}>
               <CheckBox
+                disabled={!isEdit}
                 value={isImportant}
                 onValueChange={setImportant}
                 style={styles.checkbox}
@@ -138,9 +151,10 @@ const courses = [
     <View style={styles.selectContainer}>
       <Text style={styles.titleText}>事件类型</Text>
       <Picker
+        enabled={isEdit}
         selectedValue={eventType}
         onValueChange={itemValue => setEventType(itemValue)}
-        style={{ width: 120 }}
+        style={{ width: 120 ,color:'black'}}
       >
         <Picker.Item label="课程" value="课程" />
         <Picker.Item label="日程" value="日程" />
@@ -150,9 +164,10 @@ const courses = [
     <View style={styles.selectContainer}>
       <Text style={styles.titleText}>课程代码</Text>
       <Picker
+        enabled={isEdit}
         selectedValue={eventType}
         onValueChange={itemValue => setEventType(itemValue)}
-        style={{ width: 160 }}
+        style={{ width: 160 ,color:'black'}}
       >
 {/*       todo：获取代码编号 */}
         {courses.map((course, index) => (
@@ -161,12 +176,26 @@ const courses = [
       </Picker>
     </View>
 
+    {!isEdit&&(
+    <View style={{flexDirection:'row',justifyContent:'space-between',width:'100%',marginVertical:15}}>
+        <TouchableOpacity onPress={() => navigation.navigate('Note')} style={styles.buttonMiddleContainer}>
+           <Image source={require('../image/note.png')} style={styles.icon}/>
+           <Text style={styles.buttonMiddleText}>课堂笔记</Text>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => navigation.navigate('Talk')} style={styles.buttonMiddleContainer}>
+           <Image source={require('../image/talk.png')} style={styles.icon}/>
+           <Text style={styles.buttonMiddleText}>课堂讨论</Text>
+        </TouchableOpacity>
+    </View>
+    )}
+    {isEdit&&(
     <View style={{height:35}}></View>
+    )}
 
     <View style={styles.selectContainer}>
       <Text style={styles.titleText}>日期</Text>
-      <TouchableOpacity onPress={showMode} style={styles.select}>
-        <Text>{dateText}</Text>
+      <TouchableOpacity disabled={!isEdit} onPress={showMode} style={styles.select}>
+        <Text style={{color:'black'}}>{dateText}</Text>
         <Image source={require('../image/select.png')} style={styles.icon}/>
       </TouchableOpacity>
       {show && (
@@ -187,8 +216,8 @@ const courses = [
         <View style={styles.selectContainer}>
           <Text style={styles.titleText}>开始时间</Text>
              <View>
-                <TouchableOpacity onPress={showStartTimePicker} style={styles.select}>
-                  {selectedStartTime && <Text>{selectedStartTime.toLocaleTimeString()}</Text>}
+                <TouchableOpacity disabled={!isEdit} onPress={showStartTimePicker} style={styles.select}>
+                  {selectedStartTime && <Text style={{color:'black'}}>{selectedStartTime.toLocaleTimeString()}</Text>}
                   <Image source={require('../image/select.png')} style={styles.icon}/>
                 </TouchableOpacity>
                 <DateTimePickerModal
@@ -203,8 +232,8 @@ const courses = [
         <View style={styles.selectContainer}>
           <Text style={styles.titleText}>结束时间</Text>
              <View>
-                <TouchableOpacity onPress={showEndTimePicker} style={styles.select}>
-                  {selectedEndTime && <Text>{selectedEndTime.toLocaleTimeString()}</Text>}
+                <TouchableOpacity disabled={!isEdit} onPress={showEndTimePicker} style={styles.select}>
+                  {selectedEndTime && <Text style={{color:'black'}}>{selectedEndTime.toLocaleTimeString()}</Text>}
                   <Image source={require('../image/select.png')} style={styles.icon}/>
                 </TouchableOpacity>
                 <DateTimePickerModal
@@ -222,8 +251,8 @@ const courses = [
     {eventType === "课程" && (
     <View style={styles.selectContainer}>
        <Text style={styles.titleText}>时间</Text>
-      <TouchableOpacity onPress={() => setModalClassVisible(true)} style={styles.select} >
-          <Text>{selectedClassesText}</Text>
+      <TouchableOpacity disabled={!isEdit} onPress={() => setModalClassVisible(true)} style={styles.select} >
+          <Text style={{color:'black'}}>{selectedClassesText}</Text>
           <Image source={require('../image/select.png')} style={styles.icon}/>
       </TouchableOpacity>
       <ClassSelectionModal
@@ -236,14 +265,16 @@ const courses = [
     <View style={{height:35}}></View>
 
     <View style={[styles.selectContainer,{justifyContent:'center'}]}>
-      <TouchableOpacity onPress={() => setModalTableVisible(true)} style={[styles.select,{justifyContent:'center'}]} >
+      <TouchableOpacity disabled={!isEdit} onPress={() => setModalTableVisible(true)} style={[styles.select,{justifyContent:'center'}]} >
           <Text style={styles.titleText}>{selectedTable} </Text>
           <Image source={require('../image/select.png')} style={styles.icon}/>
       </TouchableOpacity>
       <TableSelectionModal
+        navigation={navigation}
         isVisible={modalTableVisible}
         onClose={() => setModalTableVisible(false)}
         onSelect={handleSelectTable}
+        defaultTable={selectedTable}
       />
     </View>
 
@@ -254,6 +285,7 @@ const courses = [
           <Image source={require('../image/select.png')} style={styles.icon}/>
       </TouchableOpacity>
       <ClassRepeatSelectionModal
+        isEdit={isEdit}
         isVisible={modalClassRepeatVisible}
         onClose={() => setModalClassRepeatVisible(false)}
         onSelect={handleSelectClassRepeat}
@@ -267,6 +299,7 @@ const courses = [
           <Image source={require('../image/select.png')} style={styles.icon}/>
       </TouchableOpacity>
       <EventRepeatSelectionModal
+        isEdit={isEdit}
         isVisible={modalEventRepeatVisible}
         onClose={() => setModalEventRepeatVisible(false)}
         onSelect={handleSelectEventRepeat}
@@ -301,6 +334,7 @@ const styles = StyleSheet.create({
     paddingLeft: 20,
     backgroundColor: '#FFFFFF',
     borderRadius: 10,
+    color: 'black',
   },
   buttonContainer: {
     width: '100%',
@@ -367,7 +401,26 @@ const styles = StyleSheet.create({
          alignItems: 'center',
          marginRight: 15,
          width: 130,
+    },
+    buttonMiddleContainer:{
+        flexDirection:'row',
+        justifyContent:'space-evenly',
+        height:45,
+        width:140,
+        alignItems:'center',
+        borderRadius:10,
+        backgroundColor:'#002FA7',
+        marginTop:15,
+    },
+    buttonMiddleText:{
+        color:'white',
+        fontSize:18,
+        fontWeight:'bold',
+    },
+    icon:{
+        width:20,
+        height:20,
     }
 });
 
-export default AddScreen;
+export default EventEdit;

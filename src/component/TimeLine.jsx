@@ -3,7 +3,7 @@ import { ScrollView, View, Text, StyleSheet, StatusBar } from 'react-native';
 import DayTimeBlock from './DayTimeBlock'; // 确保路径正确
 import WeekTimeBlock from './WeekTimeBlock'; // 确保路径正确
 
-const TimeLine = ({selectedDate,type}) => {
+const TimeLine = ({navigation,selectedDate,type}) => {
   const hours = Array.from({ length: 24 }, (_, i) => i);
   const timeBlocks = [
     // 假设的时间块数据
@@ -27,7 +27,7 @@ const TimeLine = ({selectedDate,type}) => {
                 <DayTimeBlock
                 key={index}
                 block={block}
-                onPress={() => console.log('时间块被点击')}
+                onPress={() => navigation.navigate('Detail', { course:block })}
                 />
                 );
             } else if (type === 'week') {
@@ -35,7 +35,7 @@ const TimeLine = ({selectedDate,type}) => {
                 <WeekTimeBlock
                 key={index}
                 block={block}
-                onPress={() => console.log('时间块被点击')}
+                onPress={() => navigation.navigate('Detail', { course:block })}
                 />
             );
         }

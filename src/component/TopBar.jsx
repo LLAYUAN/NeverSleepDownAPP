@@ -1,8 +1,11 @@
 import React, { useState,useEffect} from 'react';
 import { View, TouchableOpacity, Text, StyleSheet,Image} from 'react-native';
+import MenuModal from './MenuModal';
 
 const TopBar = ({navigation,active}) => {
   // State to manage which button is active
+  const [modalVisible, setModalVisible] = useState(false);
+
 
 const handleRenderPress = (index) => {
     if (index === 2) {
@@ -28,10 +31,17 @@ const handleRenderPress = (index) => {
   return (
     <View style={styles.container}>
         <TouchableOpacity
+            onPress={() => setModalVisible(true)}
             style={styles.squareStyle}
           >
           <Image source={require('../image/menu-burger.png')} style={styles.icon}/>
         </TouchableOpacity>
+          <MenuModal
+            navigation={navigation}
+            isVisible={modalVisible}
+            onClose={() => setModalVisible(false)}
+          />
+
         <View style={{flexDirection:'row',justifyContent:'space-between',width:200}}>
             {renderButton('月', 2)}
             {renderButton('周', 3)}

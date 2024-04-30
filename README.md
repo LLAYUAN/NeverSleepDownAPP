@@ -87,4 +87,9 @@ yarn add react-native-datepicker
 npm install @react-native-community/datetimepicker --save
 yarn add react-native-modal-datetime-picker
 yarn add react-native-modal
+yarn add react-native-color-picker
+yarn upgrade react-native-color-picker
+yarn add @react-native-community/slider
+yarn add @react-native-community/color-picker
+yarn add tinycolor2
 ```

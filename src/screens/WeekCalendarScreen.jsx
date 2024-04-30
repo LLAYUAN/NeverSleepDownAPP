@@ -27,7 +27,7 @@ const updateWeek = (direction) => {
             <WeekCalendar navigation={navigation} navigation={navigation}selectedDate={selectedDate} currentWeekStart={currentWeekStart} setSelectedDate={setSelectedDate} updateWeek={updateWeek}/>
         </View>
 {/* todo:根据选择日期调出当天的事件绘制timeline */}
-        <TimeLine selectedDate={selectedDate} type={'week'}/>
+        <TimeLine navigation={navigation} selectedDate={selectedDate} type={'week'}/>
     </View>
     )
 

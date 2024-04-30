@@ -2,7 +2,7 @@ import React, { useState,useEffect } from 'react';
 import { Modal, View, Text, TouchableOpacity, Button ,StyleSheet} from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 
-const ClassRepeatSelectionModal = ({ isVisible, onClose, onSelect }) => {
+const ClassRepeatSelectionModal = ({ isEdit,isVisible, onClose, onSelect }) => {
   const [selectedClasses, setSelectedClasses] = useState([]);
   const [type, setType] = useState(0);//0是随机，1是全部，2是单周，3是双周
 
@@ -91,13 +91,13 @@ const ClassRepeatSelectionModal = ({ isVisible, onClose, onSelect }) => {
           <Text style={styles.littleTitle}>选择重复周数</Text>
 
           <View style={{flexDirection:'row',justifyContent:'space-between',width:'90%',margin:20}}>
-            <TouchableOpacity onPress={handlePressAll} style={[styles.typeButton,{backgroundColor: type===1?'#002FA7' : 'white'}]} >
+            <TouchableOpacity disabled={!isEdit} onPress={handlePressAll} style={[styles.typeButton,{backgroundColor: type===1?'#002FA7' : 'white'}]} >
                <Text style={{color:type===1?'white' : '#002FA7',fontWeight:'bold'}}>全部</Text>
             </TouchableOpacity>
-            <TouchableOpacity onPress={handlePressOne} style={[styles.typeButton,{backgroundColor: type===2?'#002FA7' : 'white'}]} >
+            <TouchableOpacity disabled={!isEdit} onPress={handlePressOne} style={[styles.typeButton,{backgroundColor: type===2?'#002FA7' : 'white'}]} >
                <Text style={{color:type===2?'white' : '#002FA7',fontWeight:'bold'}}>单周</Text>
             </TouchableOpacity>
-            <TouchableOpacity onPress={handlePressTwo} style={[styles.typeButton,{backgroundColor: type===3?'#002FA7' : 'white'}]} >
+            <TouchableOpacity disabled={!isEdit} onPress={handlePressTwo} style={[styles.typeButton,{backgroundColor: type===3?'#002FA7' : 'white'}]} >
                <Text style={{color:type===3?'white' : '#002FA7',fontWeight:'bold'}}>双周</Text>
             </TouchableOpacity>
           </View>
@@ -105,6 +105,7 @@ const ClassRepeatSelectionModal = ({ isVisible, onClose, onSelect }) => {
           <View style={styles.container}>
             {week.map((classNumber) => (
               <TouchableOpacity
+                disabled={!isEdit}
                 key={classNumber}
                 style={[
                   styles.button,

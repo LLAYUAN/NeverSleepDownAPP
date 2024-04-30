@@ -1,14 +1,10 @@
 import React, { useState } from 'react';
 import { Modal,Image,StyleSheet, View, TextInput, Button, Text,TouchableOpacity,ActionSheetAndroid } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
-import CheckBox from '@react-native-community/checkbox';
 import { Picker } from '@react-native-picker/picker';
-import EventEdit from '../component/EventEdit';
-import DateTimePicker from '@react-native-community/datetimepicker';
-import { ColorPicker } from 'react-native-color-picker';
-import ColorPickerModal from '../component/ColorPickerModal';
 
-const SettingScreen = ({ navigation }) => {
+
+const ProfileScreen = ({ navigation }) => {
 
 //todo：处理保存逻辑
   const handleFinish = () => {
@@ -257,4 +253,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default SettingScreen;
+export default ProfileScreen;
