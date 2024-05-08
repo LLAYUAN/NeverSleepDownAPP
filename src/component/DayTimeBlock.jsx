@@ -2,7 +2,7 @@ import React from 'react';
 import { TouchableOpacity, Text, StyleSheet } from 'react-native';
 
 const DayTimeBlock = ({ block, onPress }) => {
-  const blockStyle = block.type === 'class' ? styles.classBlock : styles.eventBlock;
+  const blockStyle = block.type === false ? styles.classBlock : styles.eventBlock;
 
   const topPosition = block.startTime * 60+30; // 假设每小时高度为60单位
   const blockHeight = (block.endTime - block.startTime) * 60; // 持续时间转换为高度

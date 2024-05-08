@@ -1,17 +1,11 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import { ScrollView, View, Text, StyleSheet, StatusBar } from 'react-native';
 import DayTimeBlock from './DayTimeBlock'; // 确保路径正确
-import WeekTimeBlock from './WeekTimeBlock'; // 确保路径正确
+import WeekTimeBlock from './WeekTimeBlock';
+import AsyncStorage from "@react-native-community/async-storage"; // 确保路径正确
 
-const TimeLine = ({navigation,selectedDate,type}) => {
+const TimeLine = ({navigation,selectedDate,type,timeBlocks}) => {
   const hours = Array.from({ length: 24 }, (_, i) => i);
-  const timeBlocks = [
-    // 假设的时间块数据
-    //todo：startTime和显示的time的换算,日期和周几的换算
-    { type: 'class', name: '数学', location: '教室112', time: '8:00-9:30',startTime: 8, endTime: 9.5,weekday:1},
-    { type: 'event', name: '数学', location: '教室112', time: '10:00-13:00',startTime: 10, endTime: 13,weekday:7},
-    // ...其他时间块数据
-  ];
 
   return (
     <ScrollView style={styles.container}>
@@ -23,11 +17,13 @@ const TimeLine = ({navigation,selectedDate,type}) => {
       ))}
       {timeBlocks.map((block, index) => {
             if (type === 'day') {
+              console.log("timeline:blockid:");
+              console.log(block.id);
                 return (
                 <DayTimeBlock
                 key={index}
                 block={block}
-                onPress={() => navigation.navigate('Detail', { course:block })}
+                onPress={() => navigation.navigate('Detail', { eventID:block.id })} //修改了此处
                 />
                 );
             } else if (type === 'week') {
@@ -35,7 +31,7 @@ const TimeLine = ({navigation,selectedDate,type}) => {
                 <WeekTimeBlock
                 key={index}
                 block={block}
-                onPress={() => navigation.navigate('Detail', { course:block })}
+                onPress={() => navigation.navigate('Detail', { eventID:block.id })}
                 />
             );
         }

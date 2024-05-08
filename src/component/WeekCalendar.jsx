@@ -66,9 +66,9 @@ const styles = StyleSheet.create({
   today: {
     backgroundColor: '#CCCCCC',
   },
-  dayText: {
-    fontSize: 14,
-  },
+  // dayText: {
+  //   fontSize: 14,
+  // },
   dateText: {
     fontSize: 18,
   },

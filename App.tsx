@@ -19,10 +19,24 @@ import TimeSettingScreen from './src/screens/TimeSettingScreen';
 import ProfileScreen from './src/screens/ProfileScreen';
 import ChangeSecretScreen from './src/screens/ChangeSecretScreen';
 import ForgetSecretScreen from './src/screens/ForgetSecretScreen';
+import AsyncStorage from '@react-native-community/async-storage';
+import axios from "axios";
 
 const Stack = createNativeStackNavigator();
 
 function App() {
+
+  axios.interceptors.request.use(async (config) => {
+    const cookie = await AsyncStorage.getItem('cookie');
+    if (cookie) {
+      config.headers.Cookie = cookie;
+    }
+    return config;
+  }, (error) => {
+    // 处理请求错误
+    return Promise.reject(error);
+  });
+
   return (
     <NavigationContainer>
       <Stack.Navigator initialRouteName="Login">

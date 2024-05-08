@@ -3,6 +3,10 @@ import { StyleSheet, View, TextInput, Button, Text,TouchableOpacity } from 'reac
 import LinearGradient from 'react-native-linear-gradient';
 import CheckBox from '@react-native-community/checkbox';
 
+import axios from 'axios';
+import AsyncStorage from "@react-native-community/async-storage";
+//const baseUrl = 'http://127.0.0.1:4523/m1/4226545-0-default/test';
+
 
 const LoginScreen = ({ navigation }) => {
   const [username, setUsername] = useState('');
@@ -11,9 +15,43 @@ const LoginScreen = ({ navigation }) => {
 
 
   const handleLogin = () => {
+    console.log("handle login111");
+    console.log(username);
+    console.log(password);
     // Implement your login logic here
-    console.log('Username:', username, 'Password:', password, 'AutoLogin:', isSelected);
-    navigation.navigate('Home');
+    axios({
+      method: 'post',
+      url: 'https://mock.apifox.com/m1/4226545-3867488-default/isPasswordCorrect',
+      headers: { 
+          'User-Agent': 'Apifox/1.0.0 (https://apifox.com)'
+      },
+      data: {
+        userID: username,
+        password: password,
+        isAutoLogin: isSelected
+      }
+    }).then(response => {
+      //console.log(JSON.stringify(response.data));
+      if (response.data.code && response.data.data) {
+        console.log("cookies:");
+        console.log(response.data.data.cookie);
+        AsyncStorage.setItem('cookie', response.data.data.cookie);
+        console.log("isLogin:");
+        console.log(response.data.data.isLogin);
+        if (response.data.data.isLogin) {
+          navigation.navigate('Home');
+        }
+      } else {
+        console.error("Error: code is 0!");
+      }
+    }).catch(error => {
+      console.error('Error fetching data:', error);
+    });
+
+   console.log("handle login222");
+
+    //console.log('Username:', username, 'Password:', password, 'AutoLogin:', isSelected);
+    //navigation.navigate('Home');
   };
 
   return (
@@ -75,7 +113,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: '#F0F0F7',
-    position: 'relative'
+    position: 'relative',
+    padding: 20
   },
   block: {
     position: 'absolute',
@@ -128,15 +167,15 @@ const styles = StyleSheet.create({
     marginTop: 20,
     color: '#000F37',
   },
-  container: {
+  /*container: {
       flex: 1,
       justifyContent: 'center',
       alignItems: 'center',
       padding: 20,
-    },
+    },*/
     checkboxContainer: {
       justifyContent: 'center',
-      alignItems: 'center',
+      /*alignItems: 'center',*/
       flexDirection: 'row',
       alignItems: 'center',
     },

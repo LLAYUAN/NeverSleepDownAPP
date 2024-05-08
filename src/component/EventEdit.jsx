@@ -391,10 +391,10 @@ const styles = StyleSheet.create({
         color: '#002FA7',
         fontWeight: 'bold',
     },
-    icon:{
-        width: 15,
-        height: 15,
-    },
+    // icon:{
+    //     width: 15,
+    //     height: 15,
+    // },
     select:{
          flexDirection: 'row',
          justifyContent: 'space-between',

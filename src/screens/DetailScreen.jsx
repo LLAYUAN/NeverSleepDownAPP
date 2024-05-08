@@ -6,13 +6,16 @@ import { Picker } from '@react-native-picker/picker';
 import EventEdit from '../component/EventEdit';
 import DateTimePicker from '@react-native-community/datetimepicker';
 
-const DetailScreen = ({ route,navigation}) => {
+const DetailScreen = ({ route,navigation/*添加了eventID*/}) => {
 
 //todo: 这里course是再次硬编码的，course是从TimeLine通过路由传进来的，在TimeLine硬编码的格式和这边不太一样
 //按理说应该直接用下面这句
 //const course = route.params?.course;
+  const { eventID } = route.params;
+  console.log("detailpage:eventID:");
+  console.log(eventID);
 
-course={eventName: '软件工程', eventLocation: '教学楼A101', courseCode:'SE12321',isImportant:true,type:0};
+const course={eventName: '软件工程', eventLocation: '教学楼A101', courseCode:'SE12321',isImportant:true,type:0};
 
 const[isEdit,setIsEdit] = useState(false);
   const handleFinish = () => {
