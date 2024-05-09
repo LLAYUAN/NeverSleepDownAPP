@@ -36,6 +36,9 @@ const LoginScreen = ({ navigation }) => {
         console.log("cookies:");
         console.log(response.data.data.cookie);
         AsyncStorage.setItem('cookie', response.data.data.cookie);
+        console.log("tabledata:");
+        console.log(response.data.data);
+        AsyncStorage.setItem('tabledata', JSON.stringify(response.data.data));
         console.log("isLogin:");
         console.log(response.data.data.isLogin);
         if (response.data.data.isLogin) {

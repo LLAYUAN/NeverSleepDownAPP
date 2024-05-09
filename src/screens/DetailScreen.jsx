@@ -1,10 +1,13 @@
-import React, { useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import { Image,StyleSheet, View, TextInput, Button, Text,TouchableOpacity,ActionSheetAndroid } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import CheckBox from '@react-native-community/checkbox';
 import { Picker } from '@react-native-picker/picker';
 import EventEdit from '../component/EventEdit';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import axios from "axios";
+import {response} from "../../.yarn/releases/yarn-1.22.22";
+import AsyncStorage from "@react-native-community/async-storage";
 
 const DetailScreen = ({ route,navigation/*添加了eventID*/}) => {
 
@@ -14,6 +17,25 @@ const DetailScreen = ({ route,navigation/*添加了eventID*/}) => {
   const { eventID } = route.params;
   console.log("detailpage:eventID:");
   console.log(eventID);
+
+  useEffect(() => {
+    axios({
+      method: 'post',
+      url: 'https://mock.apifox.com/m1/4226545-3867488-default/loadEventInfo',
+      headers: {
+        'User-Agent': 'Apifox/1.0.0 (https://apifox.com)'
+      },
+      data: {
+        eventID: eventID
+      }
+    }).then(response => {
+      if (response.data.code && response.data.event) {
+        
+      } else {
+        console.error("Error: code is 0!");
+      }
+    })
+  }, [eventID]);
 
 const course={eventName: '软件工程', eventLocation: '教学楼A101', courseCode:'SE12321',isImportant:true,type:0};
 
