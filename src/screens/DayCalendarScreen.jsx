@@ -23,7 +23,8 @@ export default function DayCalendarScreen({ route,navigation }){
     };
 
     const convertEventToTimeBlock = (event) => {
-        //console.log("run convertEventToTimeBlock");
+        console.log("run convertEventToTimeBlock");
+        console.log(selectedDate);
         const startTime = convertTimeToFloat(event.startTime);
         const endTime = convertTimeToFloat(event.endTime);
         return {
@@ -32,6 +33,7 @@ export default function DayCalendarScreen({ route,navigation }){
             id: event.eventID,
             location: event.eventLocation,
             time: `${event.startTime}-${event.endTime}`,
+            date: selectedDate.toLocaleDateString(),
             startTime,
             endTime,
         };
@@ -90,17 +92,18 @@ export default function DayCalendarScreen({ route,navigation }){
       useEffect(() => {
         // 这里没有直接修改依赖项，因此不会引起死循环
         setSelectedDate(selectDay);
-        //在此处调用updateData,确保每次selectDay更新时,都调用一次updateData
-          // 以selectedDate为准
-        console.log("useSelectedDate:");
-        console.log(selectedDate.toLocaleDateString());
-        updateData(selectedDate);
       }, [selectDay]); // 依赖项是selectDay，它由useMemo稳定，只有当selectDayStr变化时才重新计算
 
     console.log('2',selectedDate.toLocaleDateString());
     const [currentWeekStart, setCurrentWeekStart] = useState(startOfWeek(selectedDate, { weekStartsOn: 1 }));
       useEffect(() => {
         setCurrentWeekStart(startOfWeek(selectedDate, { weekStartsOn: 1 }));
+
+          //在此处调用updateData,确保每次selectedDate更新时,都调用一次updateData
+          // 以selectedDate为准
+          console.log("useSelectedDate:");
+          console.log(selectedDate.toLocaleDateString());
+          updateData(selectedDate);
       }, [selectedDate]);
 
 

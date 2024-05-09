@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import { Image,StyleSheet, View, TextInput, Button, Text,TouchableOpacity,ActionSheetAndroid } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import CheckBox from '@react-native-community/checkbox';
@@ -9,6 +9,8 @@ import ClassSelectionModal from './ClassSelectionModal';
 import TableSelectionModal from './TableSelectionModal';
 import ClassRepeatSelectionModal from './ClassRepeatSelectionModal';
 import EventRepeatSelectionModal from './EventRepeatSelectionModal';
+import AsyncStorage from "@react-native-community/async-storage";
+import {parse} from "date-fns/parse";
 
 const EventEdit = ({ navigation ,isEdit,course}) => {
 //todo:从数据库获取课程代码
@@ -19,13 +21,17 @@ const courses = [
   // 更多课程...
 ];
 
+  console.log("EventEdit:course:");
+  console.log(course);
+  const [tableName, setTableName] = useState("默认");
+
   const [name, setName] = useState(course?.eventName || '');
   const [location, setLocation] = useState(course?.eventLocation || '');
   const [isImportant, setImportant] = useState(course?.isImportant || false);
 
   const [eventType, setEventType] = useState(() => {
     if (course) {
-      return course.eventType===true ? "课程" : "日程";
+      return course.type===false ? "课程" : "日程";
     } else {
       return "课程";  // 如果没有 course 对象，缺省值为 "课程"
     }
@@ -34,20 +40,26 @@ const courses = [
 //todo:如果有传进来course这个参数，就用course里的数据，否则用默认数据
 //需要初始化data，selectedStartTime，selectedEndTime，selectedClassesText，selectedTable，selectedClassRepeat，selectedEventRepeat
 //需要用后端数据初始化一下，这里的变量的类型可以看下set的时候set是啥（）
-  const [date, setDate] = useState(new Date());
+  //console.log("course.eventDate:");
+  //console.log(course.eventDate);
+  //很神奇，这个tmpdate时间总是在前一天，但是显示的却是正确的。即course.eventDate是5/9 tmpdate是5/8 显示的也是5/9 竟然是对的？？？
+  const tmpdate = parse(course.eventDate, "yyyy/MM/dd", new Date());
+  //console.log("tmpdate:");
+  //console.log(tmpdate);
+  const [date, setDate] = useState(tmpdate);
   const [show, setShow] = useState(false);
   const [dateText, setDateText] = useState(date.toDateString());
 
   const [isStartTimePickerVisible, setStartTimePickerVisibility] = useState(false);
   const [isEndTimePickerVisible, setEndTimePickerVisibility] = useState(false);
-  const [selectedStartTime, setStartTime] = useState(null);
-  const [selectedEndTime, setEndTime] = useState(null);
+  const [selectedStartTime, setStartTime] = useState(course.startTime);
+  const [selectedEndTime, setEndTime] = useState(course.endTime);
 
   const [modalClassVisible, setModalClassVisible] = useState(false);
   const [selectedClassesText, setSelectedClassesText] = useState('');
   //todo：默认工作表
   const [modalTableVisible, setModalTableVisible] = useState(false);
-  const [selectedTable, setSelectedTable] = useState('默认工作表');
+  const [selectedTable, setSelectedTable] = useState(tableName);
 
   const [modalClassRepeatVisible, setModalClassRepeatVisible] = useState(false);
   const [selectedClassRepeat, setSelectedClassRepeat] = useState([]);

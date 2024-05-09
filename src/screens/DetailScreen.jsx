@@ -14,10 +14,19 @@ const DetailScreen = ({ route,navigation/*添加了eventID*/}) => {
 //todo: 这里course是再次硬编码的，course是从TimeLine通过路由传进来的，在TimeLine硬编码的格式和这边不太一样
 //按理说应该直接用下面这句
 //const course = route.params?.course;
-  const { eventID } = route.params;
-  console.log("detailpage:eventID:");
-  console.log(eventID);
+  const { eventID, eventDate } = route.params;
+  useEffect(() => {
+    console.log("detailpage:eventID:");
+    console.log(eventID);
+  }, [eventID]);
+  useEffect(() => {
+    console.log("detailpage:eventDate:");
+    console.log(eventDate);
+  }, [eventDate]);
 
+  //const [course, setCourse] = useState(null);
+  const [course, setCourse] = useState(null);
+  const [isCourseReady, setIsCourseReady] = useState(false);
   useEffect(() => {
     axios({
       method: 'post',
@@ -30,14 +39,28 @@ const DetailScreen = ({ route,navigation/*添加了eventID*/}) => {
       }
     }).then(response => {
       if (response.data.code && response.data.event) {
-        
+        console.log("detail:getResponseData:");
+        console.log(response.data.event);
+        const tmpcourse = {
+          eventName: response.data.event.eventName,
+          eventLocation: response.data.event.eventLocation,
+          courseCode: response.data.event.courseCode,
+          isImportant: response.data.event.isImportant,
+          type: response.data.event.type,
+          eventID: eventID,
+          eventDate: eventDate,
+          startTime: response.data.event.dayRepeat[0].startTime,
+          endTime: response.data.event.dayRepeat[0].endTime
+        }
+        setCourse(tmpcourse);
+        setIsCourseReady(true);
       } else {
         console.error("Error: code is 0!");
       }
     })
   }, [eventID]);
 
-const course={eventName: '软件工程', eventLocation: '教学楼A101', courseCode:'SE12321',isImportant:true,type:0};
+//const course={eventName: '软件工程', eventLocation: '教学楼A101', courseCode:'SE12321',isImportant:true,type:0};
 
 const[isEdit,setIsEdit] = useState(false);
   const handleFinish = () => {
@@ -73,7 +96,7 @@ const[isEdit,setIsEdit] = useState(false);
 
       </View>
 
-      <EventEdit navigation={navigation} isEdit={isEdit} course={course}/>
+    {isCourseReady && <EventEdit navigation={navigation} isEdit={isEdit} course={course}/>}
 
     {isEdit &&(
           <View style={styles.buttonContainer}>

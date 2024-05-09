@@ -23,7 +23,7 @@ const TimeLine = ({navigation,selectedDate,type,timeBlocks}) => {
                 <DayTimeBlock
                 key={index}
                 block={block}
-                onPress={() => navigation.navigate('Detail', { eventID:block.id })} //修改了此处
+                onPress={() => navigation.navigate('Detail', { eventID:block.id, eventDate: block.date })} //修改了此处
                 />
                 );
             } else if (type === 'week') {
@@ -31,7 +31,7 @@ const TimeLine = ({navigation,selectedDate,type,timeBlocks}) => {
                 <WeekTimeBlock
                 key={index}
                 block={block}
-                onPress={() => navigation.navigate('Detail', { eventID:block.id })}
+                onPress={() => navigation.navigate('Detail', { eventID:block.id, eventDate: block.date })}
                 />
             );
         }

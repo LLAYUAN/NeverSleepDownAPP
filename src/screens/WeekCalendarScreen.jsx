@@ -90,7 +90,8 @@ const getWeekDays = (date) => {
         time: `${event.startTime}-${event.endTime}`,
         startTime: convertTimeToFloat(event.startTime),
         endTime: convertTimeToFloat(event.endTime),
-        weekday: event.weekday
+        weekday: event.weekday,
+        date: event.date
     });
 
     //selectedDate一变就重新调用
@@ -114,17 +115,22 @@ const getWeekDays = (date) => {
                 // 将事件按星期几整理
                 const eventsByWeekday = responses.reduce((acc, response, index) => {
                     let weekday = weekDays[index].getDay(); // 获取星期几
+                    let weekdate = weekDates[index];
                     // 将星期天的 weekday 设置为 7
                     if (weekday === 0) {
                         weekday = 7;
                     }
+                    console.log("weekday,weekdate:");
+                    console.log(weekday);
+                    console.log(weekdate);
                     //set weeknow
                     setWeeknow(response.data.weeknow);
                     response.data.eventArr.forEach(event => {
                         // 为每个事件添加 weekday 属性
                         acc.push({
                             ...event,
-                            weekday: weekday
+                            weekday: weekday,
+                            date: weekdate
                         });
                     });
                     return acc;
@@ -143,6 +149,10 @@ const getWeekDays = (date) => {
     useEffect(() => {
         console.log("weekTimeBlocks:");
         console.log(weekTimeBlocks);
+        if (isWeekTimeBlocksReady) {
+            console.log("change FinalWeekTimeBlocks because WeekTimeBlocks change")
+            setFinalWeekTimeBlocks(weekTimeBlocks.map(formatEvent));
+        }
     }, [weekTimeBlocks]);
 
     //在weekTimeBlocks set完毕之后将其转为标准型
