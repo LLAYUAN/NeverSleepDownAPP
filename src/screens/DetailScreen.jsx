@@ -24,6 +24,15 @@ const DetailScreen = ({ route,navigation/*添加了eventID*/}) => {
     console.log(eventDate);
   }, [eventDate]);
 
+  //将startTimeNumber和endTimeNumber转化为从startTimeNumber到endTimeNumber的string
+  const convertTimeNumbertoString = (startTimeNumber, endTimeNumber) => {
+    let result = startTimeNumber.toString();
+    for (let i = startTimeNumber + 1; i <= endTimeNumber; i++) {
+      result = result +','+ i.toString();
+    }
+    return result;
+  }
+
   //const [course, setCourse] = useState(null);
   const [course, setCourse] = useState(null);
   const [isCourseReady, setIsCourseReady] = useState(false);
@@ -41,6 +50,11 @@ const DetailScreen = ({ route,navigation/*添加了eventID*/}) => {
       if (response.data.code && response.data.event) {
         console.log("detail:getResponseData:");
         console.log(response.data.event);
+        console.log("detail:dayRepeat:");
+        console.log(response.data.event.dayRepeat[0]);
+        const tmpres = convertTimeNumbertoString(response.data.event.dayRepeat[0].startTimeNumber,response.data.event.dayRepeat[0].endTimeNumber);
+        console.log("ke cheng suo zhan jie shu:");
+        console.log(tmpres);
         const tmpcourse = {
           eventName: response.data.event.eventName,
           eventLocation: response.data.event.eventLocation,
@@ -49,8 +63,11 @@ const DetailScreen = ({ route,navigation/*添加了eventID*/}) => {
           type: response.data.event.type,
           eventID: eventID,
           eventDate: eventDate,
-          startTime: response.data.event.dayRepeat[0].startTime,
-          endTime: response.data.event.dayRepeat[0].endTime
+          startTime: response.data.event.dayRepeat[0].startTime + ':00',//传到eventedit的时候加个秒，这样统一，好看点
+          endTime: response.data.event.dayRepeat[0].endTime + ':00',
+          timeNum: tmpres,
+          weekRepeat: response.data.event.weekRepeat,
+          dayRepeatNum: response.data.event.dayRepeat.length
         }
         setCourse(tmpcourse);
         setIsCourseReady(true);

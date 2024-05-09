@@ -11,6 +11,7 @@ import ClassRepeatSelectionModal from './ClassRepeatSelectionModal';
 import EventRepeatSelectionModal from './EventRepeatSelectionModal';
 import AsyncStorage from "@react-native-community/async-storage";
 import {parse} from "date-fns/parse";
+import * as dateObject from "date-fns-tz";
 
 const EventEdit = ({ navigation ,isEdit,course}) => {
 //todo:从数据库获取课程代码
@@ -23,11 +24,34 @@ const courses = [
 
   console.log("EventEdit:course:");
   console.log(course);
-  const [tableName, setTableName] = useState("默认");
+  console.log("EventEdit:eventID:");
+  console.log(course.eventID);
+  //const [tableName, setTableName] = useState("默认");
 
   const [name, setName] = useState(course?.eventName || '');
+  useEffect(() => {
+    console.log("EventEdit:name:");
+    console.log(name);
+  }, [name]);
+
   const [location, setLocation] = useState(course?.eventLocation || '');
+  useEffect(() => {
+    console.log("EventEdit:location:");
+    console.log(location);
+  }, [location]);
+
   const [isImportant, setImportant] = useState(course?.isImportant || false);
+  useEffect(() => {
+    console.log("EventEdit:isImportant:");
+    console.log(isImportant);
+  }, [isImportant]);
+
+  const [courseCode, setCourseCode] = useState(course?.courseCode || '');
+  useEffect(() => {
+    console.log("EventEdit:courseCode:");
+    console.log(courseCode);
+  }, [courseCode]);
+
 
   const [eventType, setEventType] = useState(() => {
     if (course) {
@@ -36,6 +60,10 @@ const courses = [
       return "课程";  // 如果没有 course 对象，缺省值为 "课程"
     }
   });
+  useEffect(() => {
+    console.log("EventEdit:eventType:");
+    console.log(eventType);
+  }, [eventType]);
 
 //todo:如果有传进来course这个参数，就用course里的数据，否则用默认数据
 //需要初始化data，selectedStartTime，selectedEndTime，selectedClassesText，selectedTable，selectedClassRepeat，selectedEventRepeat
@@ -43,23 +71,119 @@ const courses = [
   //console.log("course.eventDate:");
   //console.log(course.eventDate);
   //很神奇，这个tmpdate时间总是在前一天，但是显示的却是正确的。即course.eventDate是5/9 tmpdate是5/8 显示的也是5/9 竟然是对的？？？
-  const tmpdate = parse(course.eventDate, "yyyy/MM/dd", new Date());
+  let tmpdate = new Date();
+  if (course) {
+     tmpdate = parse(course.eventDate, "yyyy/MM/dd", new Date());
+  }
   //console.log("tmpdate:");
   //console.log(tmpdate);
+
+  //dateText => weekday
+  const convertDateTexttoWeekday = (dateText) => {
+    const parts = dateText.split(' ');
+    const weekdays = {
+      'Mon': 1,
+      'Tue': 2,
+      'Wed': 3,
+      'Thu': 4,
+      'Fri': 5,
+      'Sat': 6,
+      'Sun': 7
+    };
+    return weekdays[parts[0]];
+
+  }
+
   const [date, setDate] = useState(tmpdate);
   const [show, setShow] = useState(false);
   const [dateText, setDateText] = useState(date.toDateString());
+  const [weekdayResult, setWeekdayResult] = useState(convertDateTexttoWeekday(dateText));
+
+  //获得该table的weekamount
+  let weekAmount;
+  let firstDayDate;
+  useEffect(() => {
+    AsyncStorage.getItem('tabledata', (error, result) => {
+      if (error) {
+        // 处理读取错误
+        console.error('读取错误:', error);
+      } else {
+        // result 是一个字符串，可能需要转换或解析
+        console.log('读取的数据:', result);
+        // 如果数据是 JSON 格式，需要解析它
+        const parsedData = JSON.parse(result);
+        // 使用解析后的数据
+        weekAmount = parsedData.weekAmount;
+        firstDayDate = parsedData.firstDayDate;
+        console.log("weekAmount:");
+        console.log(weekAmount);
+        console.log("firstDayDate:");
+        console.log(firstDayDate);
+      }
+    });
+  }, []);
+
+  //监视dateText,顺便修改weekdayResult(是过会要传给后端的值,代表星期几,是int)
+  useEffect(() => {
+    console.log("EventEdit:dateText:");
+    console.log(dateText);
+    const weekday = convertDateTexttoWeekday(dateText);
+    console.log("EventEdit:weekdayresult in dateText:");
+    console.log(weekday);
+    setWeekdayResult(weekday);
+  }, [dateText]);
+
+  //监视weekdayResult
+  useEffect(() => {
+    console.log("EventEdit:weekdayResult:");
+    console.log(weekdayResult);
+  }, [weekdayResult]);
 
   const [isStartTimePickerVisible, setStartTimePickerVisibility] = useState(false);
   const [isEndTimePickerVisible, setEndTimePickerVisibility] = useState(false);
-  const [selectedStartTime, setStartTime] = useState(course.startTime);
-  const [selectedEndTime, setEndTime] = useState(course.endTime);
+
+  const [selectedStartTime, setStartTime] = useState(course?.startTime || '');
+  //监控selectedStartTime
+  useEffect(() => {
+    console.log("EventEdit:selectedStartTime:");
+    console.log(selectedStartTime);
+  }, [selectedStartTime]);
+
+  const [selectedEndTime, setEndTime] = useState(course?.endTime || '');
 
   const [modalClassVisible, setModalClassVisible] = useState(false);
-  const [selectedClassesText, setSelectedClassesText] = useState('');
+  const [selectedClassesText, setSelectedClassesText] = useState(course?.timeNum || '');
+
+  //监控selectedClassesText，并将其中的数字按顺序排
+  useEffect(() => {
+    if (selectedClassesText) {
+      const numbers = selectedClassesText.split(',').map(Number);
+      if (numbers.some((num, index) => index > 0 && num < numbers[index - 1])) {
+        // 如果存在任意一个元素 num 小于它前一个元素，则数组未排序
+        const sortedNumbers = numbers.sort((a, b) => a - b);
+        const sortedStr = sortedNumbers.join(',');
+        setSelectedClassesText(sortedStr);
+      }
+    }
+    console.log("EventEdit:selectedClassesText:");
+    console.log(selectedClassesText);
+
+    const timeNumResult = convertClassesTexttoTimeNum(selectedClassesText);
+    console.log("timeNumResult");
+    console.log(timeNumResult);
+  }, [selectedClassesText]);
+
+  //将selectedClassesText转为startTimeNum和endTimeNum [startTimeNum, endTimeNum]
+  const convertClassesTexttoTimeNum = (selectedClassesText) => {
+    if(!selectedClassesText) return[0,0];
+    if(!selectedClassesText.includes(',')) return [parseInt(selectedClassesText, 10), parseInt(selectedClassesText, 10)];
+    const parts = selectedClassesText.split(',');
+    return [parseInt(parts[0], 10), parseInt(parts[parts.length - 1], 10)];
+  }
+
   //todo：默认工作表
-  const [modalTableVisible, setModalTableVisible] = useState(false);
-  const [selectedTable, setSelectedTable] = useState(tableName);
+  // const [modalTableVisible, setModalTableVisible] = useState(false);
+  // const [selectedTable, setSelectedTable] = useState(tableName);
 
   const [modalClassRepeatVisible, setModalClassRepeatVisible] = useState(false);
   const [selectedClassRepeat, setSelectedClassRepeat] = useState([]);
@@ -67,12 +191,30 @@ const courses = [
   const [modalEventRepeatVisible, setModalEventRepeatVisible] = useState(false);
   const [selectedEventRepeat, setSelectedEventRepeat] = useState(0);//0不重复，1每天，2每周，3每两周，4每月，5每年
 
+  const [eventtoSave, setEventtoSave] = useState({
+    type: eventType,
+    eventID: course?.eventID || 0,
+    eventName: name,
+    eventLocation: location,
+    courseCode: courseCode,
+    weekRepeat: course?.weekRepeat || '',
+    dayRepeat: [
+      {
+        date: weekdayResult,
+        startTime: selectedStartTime,
+        endTime: selectedEndTime,
+        startTimeNumber: 0,
+        endTimeNumber: 0
+      }
+    ]
+  })
+
 
   const onChange = (event, selectedDate) => {
     const currentDate = selectedDate || date;
     setShow(Platform.OS === 'ios');
     setDate(currentDate);
-    //todo: 日期显示形式
+    //todo: 日期显示形式 *不需要改*
 
     setDateText(currentDate.toDateString()); // 更新文本以显示选择的日期
   };
@@ -102,13 +244,21 @@ const courses = [
     setEndTimePickerVisibility(false);
   };
 
+  //将时分秒转为时分
+  const deleteSeconds = (times) => {
+    const result = time.split(':').slice(0, 2).join(':');
+    console.log("run deleteSeconds");
+    console.log(result);
+    return result;
+  }
+
   const handleStartTimeConfirm = (time) => {
-    setStartTime(time);
+    setStartTime(time.toLocaleTimeString());
     hideStartTimePicker();
   };
 
   const handleEndTimeConfirm = (time) => {
-    setEndTime(time);
+    setEndTime(time.toLocaleTimeString());
     hideEndTimePicker();
   };
 //todo:维护一个记录选择了哪些课的变量
@@ -123,6 +273,7 @@ const courses = [
 
   const handleSelectClassRepeat = (selectedClassRepeat) => {
     setSelectedClassRepeat(selectedClassRepeat);
+    console.log("handleSelectClassRepeat:")
     console.log(selectedClassRepeat);
   };
 
@@ -173,20 +324,17 @@ const courses = [
       </Picker>
     </View>
 
-    <View style={styles.selectContainer}>
-      <Text style={styles.titleText}>课程代码</Text>
-      <Picker
-        enabled={isEdit}
-        selectedValue={eventType}
-        onValueChange={itemValue => setEventType(itemValue)}
-        style={{ width: 160 ,color:'black'}}
-      >
-{/*       todo：获取代码编号 */}
-        {courses.map((course, index) => (
-            <Picker.Item key={index} label={course.label} value={course.value} />
-        ))}
-      </Picker>
-    </View>
+    {eventType === "课程" && (
+        <View style={styles.selectContainer}>
+          <Text style={styles.titleText}>课程代码</Text>
+          <TextInput
+              style={[styles.input,{width:120,marginRight:20,textAlign: 'right'}]}
+              editable={isEdit}
+              placeholder="输入课程代码"
+              value={courseCode}
+              onChangeText={setCourseCode}
+          />
+        </View>)}
 
     {!isEdit&&(
     <View style={{flexDirection:'row',justifyContent:'space-between',width:'100%',marginVertical:15}}>
@@ -229,7 +377,7 @@ const courses = [
           <Text style={styles.titleText}>开始时间</Text>
              <View>
                 <TouchableOpacity disabled={!isEdit} onPress={showStartTimePicker} style={styles.select}>
-                  {selectedStartTime && <Text style={{color:'black'}}>{selectedStartTime.toLocaleTimeString()}</Text>}
+                  {selectedStartTime && <Text style={{color:'black'}}>{selectedStartTime}</Text>}
                   <Image source={require('../image/select.png')} style={styles.icon}/>
                 </TouchableOpacity>
                 <DateTimePickerModal
@@ -245,7 +393,7 @@ const courses = [
           <Text style={styles.titleText}>结束时间</Text>
              <View>
                 <TouchableOpacity disabled={!isEdit} onPress={showEndTimePicker} style={styles.select}>
-                  {selectedEndTime && <Text style={{color:'black'}}>{selectedEndTime.toLocaleTimeString()}</Text>}
+                  {selectedEndTime && <Text style={{color:'black'}}>{selectedEndTime}</Text>}
                   <Image source={require('../image/select.png')} style={styles.icon}/>
                 </TouchableOpacity>
                 <DateTimePickerModal
@@ -264,7 +412,7 @@ const courses = [
     <View style={styles.selectContainer}>
        <Text style={styles.titleText}>时间</Text>
       <TouchableOpacity disabled={!isEdit} onPress={() => setModalClassVisible(true)} style={styles.select} >
-          <Text style={{color:'black'}}>{selectedClassesText}</Text>
+          <Text style={{color:'black'}}>{`第${selectedClassesText}节`}</Text>
           <Image source={require('../image/select.png')} style={styles.icon}/>
       </TouchableOpacity>
       <ClassSelectionModal
