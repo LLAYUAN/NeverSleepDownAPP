@@ -264,19 +264,19 @@ const courses = [
 
     <View style={{height:35}}></View>
 
-    <View style={[styles.selectContainer,{justifyContent:'center'}]}>
-      <TouchableOpacity disabled={!isEdit} onPress={() => setModalTableVisible(true)} style={[styles.select,{justifyContent:'center'}]} >
-          <Text style={styles.titleText}>{selectedTable} </Text>
-          <Image source={require('../image/select.png')} style={styles.icon}/>
-      </TouchableOpacity>
-      <TableSelectionModal
-        navigation={navigation}
-        isVisible={modalTableVisible}
-        onClose={() => setModalTableVisible(false)}
-        onSelect={handleSelectTable}
-        defaultTable={selectedTable}
-      />
-    </View>
+    {/*<View style={[styles.selectContainer,{justifyContent:'center'}]}>*/}
+    {/*  <TouchableOpacity disabled={!isEdit} onPress={() => setModalTableVisible(true)} style={[styles.select,{justifyContent:'center'}]} >*/}
+    {/*      <Text style={styles.titleText}>{selectedTable} </Text>*/}
+    {/*      <Image source={require('../image/select.png')} style={styles.icon}/>*/}
+    {/*  </TouchableOpacity>*/}
+    {/*  <TableSelectionModal*/}
+    {/*    navigation={navigation}*/}
+    {/*    isVisible={modalTableVisible}*/}
+    {/*    onClose={() => setModalTableVisible(false)}*/}
+    {/*    onSelect={handleSelectTable}*/}
+    {/*    defaultTable={selectedTable}*/}
+    {/*  />*/}
+    {/*</View>*/}
 
     {eventType === "课程" && (
     <View style={[styles.selectContainer,{justifyContent:'center'}]}>

@@ -14,7 +14,7 @@ const TableSelectionModal = ({ isEdit,isVisible, onClose, onSelect }) => {
     onClose();
   };
 
-  const  types=[{id:0,name:'不重复'}, {id:1,name:'每天'}, {id:2,name:'每周'}, {id:3,name:'每两周'}, {id:4,name:'每月'}, {id:5,name:'每年'}];
+  const  types=[{id:0,name:'不重复'}, {id:1,name:'每天'}, {id:2,name:'每周'}, {id:3,name:'每两周'}];
 
   return (
     <Modal
@@ -25,8 +25,8 @@ const TableSelectionModal = ({ isEdit,isVisible, onClose, onSelect }) => {
     >
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0, 0, 0, 0.5)' }}>
         <LinearGradient colors={['#FAE0E0', '#D6DCFB']} style={styles.block}>
-          <Text style={styles.title}>工作表选择</Text>
-        <ScrollView contentContainerStyle={{ paddingVertical: 20 }} style={{height:400}}>
+          <Text style={styles.title}>重复日程</Text>
+        <ScrollView contentContainerStyle={{ paddingVertical: 20 }} style={{height:200}}>
           <View style={styles.container}>
             {types.map((type) => (
               <TouchableOpacity
