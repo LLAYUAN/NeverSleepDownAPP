@@ -1,10 +1,43 @@
 import React, { useState,useEffect} from 'react';
 import { View, TouchableOpacity, Text, StyleSheet,Image} from 'react-native';
 import MenuModal from './MenuModal';
+import AiModal from './AiModal';
+import MenuHelpModal from '../component/MenuHelpModal';
+import AsyncStorage from "@react-native-community/async-storage";
 
 const TopBar = ({navigation,active}) => {
+    const [isHelpModalVisible, setIsHelpModalVisible] = useState(false);
+    const [shouldHelpModalVisible, setShouldHelpModalVisible] = useState(false);
+    useEffect(() => {
+        const fetchisFirstLogin = async () => {
+            await AsyncStorage.getItem('isFirstLogin', (error, result) => {
+                if (error) {
+                    console.error('Error reading from AsyncStorage:', error);
+                } else {
+                    const isFirstLogin = JSON.parse(result);
+                    console.log("TopBar:isFirstOpenMenu loaded from AsyncStorage:", isFirstLogin);
+                    if (isFirstLogin) {
+                        setShouldHelpModalVisible(true);
+                    }
+                }
+            });
+        };
+        fetchisFirstLogin();
+    }, []);
+
+    const toggleHelpModal = async () => {
+        setShouldHelpModalVisible(false);
+        setIsHelpModalVisible(false);
+        console.log("toggleHelpModal");
+        await AsyncStorage.setItem('isFirstLogin', JSON.stringify(false));
+    };
   // State to manage which button is active
   const [modalVisible, setModalVisible] = useState(false);
+
+    const [isAiModalVisible, setAiModalVisible] = useState(false);
+    const toggleAiModal = () => {
+        setAiModalVisible(!isAiModalVisible);
+    };
 
 
 const handleRenderPress = (index) => {
@@ -30,12 +63,28 @@ const handleRenderPress = (index) => {
 
   return (
     <View style={styles.container}>
+        {/*<TouchableOpacity*/}
+        {/*    onPress={() => setModalVisible(true)}*/}
+        {/*    style={styles.squareStyle}*/}
+        {/*  >*/}
+        {/*  <Image source={require('../image/menu-burger.png')} style={styles.icon}/>*/}
+        {/*</TouchableOpacity>*/}
+
+        <AiModal isVisible={isAiModalVisible} onClose={toggleAiModal} />
+        {/*         update */}
         <TouchableOpacity
-            onPress={() => setModalVisible(true)}
+            onPress={() =>{
+                setModalVisible(true);
+                //todo:判断用户是不是第一次点击这个的按钮，是的话设置为true
+                //setIsHelpModalVisible(true);
+                console.log("shouldHelpModalVisible",shouldHelpModalVisible);
+                if (shouldHelpModalVisible) setIsHelpModalVisible(true);
+            } }
             style={styles.squareStyle}
-          >
-          <Image source={require('../image/menu-burger.png')} style={styles.icon}/>
+        >
+            <Image source={require('../image/menu-burger.png')} style={styles.icon}/>
         </TouchableOpacity>
+
           <MenuModal
             navigation={navigation}
             isVisible={modalVisible}
@@ -48,12 +97,27 @@ const handleRenderPress = (index) => {
             {renderButton('日', 4)}
         </View>
 
+{/*UPDATE*/}
+        <TouchableOpacity
+            style={styles.ai}
+            onPress={() => setAiModalVisible(true)}
+        >
+            <Image source={require('../image/cloud-question.png')} style={styles.icon}/>
+        </TouchableOpacity>
+
         <TouchableOpacity
           style={styles.squareStyle}
-            onPress={() => navigation.navigate('Add')}
+            onPress={() => navigation.reset({
+                    index: 1,
+                    routes: [{ name: 'Home' }, { name: 'Add' }],
+                })
+            }
         >
            <Image source={require('../image/add.png')} style={styles.icon}/>
         </TouchableOpacity>
+
+        {/*     update */}
+        <MenuHelpModal isVisible={isHelpModalVisible} onClose={toggleHelpModal} />
 
     </View>
   );
@@ -105,6 +169,17 @@ const styles = StyleSheet.create({
     height: 20,
     tintColor: '#fff',
   },
+    ai:{
+        position: 'absolute',
+        left: 40,
+        top: 15,
+        width: 30,
+        height: 30,
+        backgroundColor: '#002FA7',
+        borderRadius: 5,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
 });
 
 export default TopBar;

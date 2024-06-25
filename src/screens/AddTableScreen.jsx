@@ -1,16 +1,54 @@
-import React, { useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import { StyleSheet, View, TextInput, Button, Text,TouchableOpacity } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import CheckBox from '@react-native-community/checkbox';
+import axios from "axios";
+import AsyncStorage from "@react-native-community/async-storage";
 
 
 const AddTableScreen = ({ navigation }) => {
   const [name, setName] = useState('');
+  useEffect(() => {
+    console.log("AddTableScreen:name:");
+    console.log(name);
+  }, [name]);
+
+  //这个是否复制时间暂时不做
   const [isSelected, setSelection] = useState(false);
 
 //todo: 新建工作表完成逻辑
-  const handleFinish = () => {
-    navigation.navigate('Home');
+  const handleFinish = async () => {
+    await axios({
+      method: 'post',
+      url: 'http://192.168.116.144:8080/switchTable',
+      // url: 'https://mock.apifox.com/m1/4226545-3867488-default/switchTable',
+      // headers: {
+      //   'User-Agent': 'Apifox/1.0.0 (https://apifox.com)'
+      // },
+      data: {
+        tableID: 0,
+        tableName: name
+      }
+    }).then(response => {
+      if (response.data.code && response.data.data) {
+        console.log("back cookie:");
+        console.log(response.data.data.cookie);
+        AsyncStorage.setItem('cookie', response.data.data.cookie);
+        AsyncStorage.setItem('tabledata', JSON.stringify(response.data.data));
+        console.log("修改cookie和tabledata");
+        navigation.navigate('Home');
+      } else {
+        console.error("Error: code is 0!");
+      }
+    }).catch(error => {
+      console.error('Error fetching data:', error);
+    });
+
+    navigation.reset({
+      index: 1,
+      routes: [{ name: 'Home' }, { name: 'Day' }],
+    });
+
   };
 
   return (
@@ -41,7 +79,7 @@ const AddTableScreen = ({ navigation }) => {
       </View>
 
       <View style={styles.LowContainer}>
-              <TouchableOpacity onPress={() => navigation.goBack()}>
+              <TouchableOpacity onPress={() => navigation.navigate('Day')}>
                   <Text style={styles.footerText}>返回</Text>
               </TouchableOpacity>
       </View>
@@ -52,15 +90,15 @@ const AddTableScreen = ({ navigation }) => {
 };
 
 const styles = StyleSheet.create({
-  container: {
-    height: '100%',
-    width: '100%',
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#F0F0F7',
-    position: 'relative'
-  },
+  // container: {
+  //   height: '100%',
+  //   width: '100%',
+  //   flex: 1,
+  //   justifyContent: 'center',
+  //   alignItems: 'center',
+  //   backgroundColor: '#F0F0F7',
+  //   position: 'relative'
+  // },
   block: {
     position: 'absolute',
     top: '25%',
@@ -113,14 +151,21 @@ const styles = StyleSheet.create({
     color: '#000F37',
   },
   container: {
-      flex: 1,
-      justifyContent: 'center',
-      alignItems: 'center',
+    height: '100%',
+    width: '100%',
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#F0F0F7',
+    position: 'relative',
+      //flex: 1,
+      //justifyContent: 'center',
+      //alignItems: 'center',
       padding: 20,
     },
     checkboxContainer: {
       justifyContent: 'center',
-      alignItems: 'center',
+      //alignItems: 'center',
       flexDirection: 'row',
       alignItems: 'center',
     },

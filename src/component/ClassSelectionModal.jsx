@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
-import { Modal, View, Text, TouchableOpacity, Button ,StyleSheet} from 'react-native';
+import {Modal, View, Text, TouchableOpacity, Button, StyleSheet, Alert} from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 
-const ClassSelectionModal = ({ isVisible, onClose, onSelect }) => {
-  const [selectedClasses, setSelectedClasses] = useState([]);
+const ClassSelectionModal = ({ isVisible, onClose, onSelect, initialSelectedClassText }) => {
+    console.log("initialSelectedClassText:",initialSelectedClassText)
+  const [selectedClasses, setSelectedClasses] = useState(!initialSelectedClassText ? [] : initialSelectedClassText.split(',').map(Number));
+  console.log("start selectedClasses", selectedClasses)
 
   const toggleClassSelection = (classNumber) => {
     const index = selectedClasses.indexOf(classNumber);
@@ -14,10 +16,42 @@ const ClassSelectionModal = ({ isVisible, onClose, onSelect }) => {
     }
   };
 
+    //todo:课程节数不连续要弹窗提示
+    const isNumbersConsecutive = (numbers) => {
+        numbers.sort((a, b) => a - b);
+        for (let i = 1; i < numbers.length; i++) {
+            if (numbers[i] - numbers[i - 1] !== 1) {
+                return false; // 发现不连续，返回false
+            }
+        }
+        return true;
+    }
+
   const handleDone = () => {
-    onSelect(selectedClasses);
+      console.log("done selectedClasses:",selectedClasses);
+      if (isNumbersConsecutive(selectedClasses)) {
+          onSelect(selectedClasses);
+      } else {
+          Alert.alert(
+              '课程节数不连续', // 标题
+              '请重新设置课程时间', // 内容
+              [
+                  {
+                      text: '确定', // 按钮文本
+                  },
+              ],
+              { cancelable: false } // 禁止通过按返回键或点击遮罩来取消
+          );
+          onSelect([]);
+          setSelectedClasses([]);
+      }
     onClose();
   };
+
+  const handleClose = () => {
+      setSelectedClasses(!initialSelectedClassText ? [] : initialSelectedClassText.split(',').map(Number));
+      onClose();
+  }
 
 //获取课程节数
   const courses = Array.from({ length: 16 }, (_, i) => i + 1); // 创建一个包含16个课程号的数组
@@ -55,7 +89,7 @@ const ClassSelectionModal = ({ isVisible, onClose, onSelect }) => {
           </View>
 {/* todo：点击返回后再点击仍会显示刚才选过的 */}
           <View style={styles.buttonContainer}>
-            <TouchableOpacity onPress={onClose} style={styles.smallButton} >
+            <TouchableOpacity onPress={handleClose} style={styles.smallButton} >
                <Text style={{color:'white'}}>返回</Text>
             </TouchableOpacity>
             <TouchableOpacity onPress={handleDone} style={styles.smallButton} >

@@ -21,7 +21,7 @@ const hsvToHex = (hsvColor) => {
 
 const [selectedColor, setSelectedColor] = useState(hexToHsv(defaultColor));
 
-handleColorChange = (color) => {
+const handleColorChange = (color) => {
   setSelectedColor(color);
 };
 

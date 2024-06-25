@@ -1,17 +1,40 @@
-import React, { useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import { Image,StyleSheet, View, TextInput, Button, Text,TouchableOpacity,ActionSheetAndroid } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import CheckBox from '@react-native-community/checkbox';
 import { Picker } from '@react-native-picker/picker';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import axios from "axios";
+import AsyncStorage from "@react-native-community/async-storage";
 
 const ExchangeScreen = ({ navigation }) => {
 //todo：处理完成逻辑，向后端发送调整
-  const handleFinish = () => {
+  const handleFinish = async () => {
     // Implement your login logic here
-    navigation.navigate('Home');
+    console.log("send tiaoxiu data");
+    await axios({
+      method: 'post',
+      url: 'http://192.168.116.144:8080/addChangeHoliday',
+      //url: 'https://mock.apifox.com/m1/4226545-3867488-default/addChangeHoliday',
+      // headers: {
+      //   'User-Agent': 'Apifox/1.0.0 (https://apifox.com)'
+      // },
+      data: datatoSend
+    }).catch(error => {
+      console.error('Error fetching data:', error);
+    });
+    navigation.reset({
+      index: 1,
+      routes: [{ name: 'Home' }, { name: 'Day' }],
+    });
   };
-
+  const initDateString = new Date().toLocaleDateString();
+  const [datatoSend, setDatatoSend] = useState(
+      {
+        modifiedDate: initDateString,
+        replaceDate: ''
+      }
+  )
   const [date, setDate] = useState(new Date());
   const [show, setShow] = useState(false);
   const [dateText, setDateText] = useState(date.toDateString());
@@ -21,6 +44,14 @@ const ExchangeScreen = ({ navigation }) => {
     setShow(Platform.OS === 'ios');
     setDate(currentDate);
     //todo: 日期显示形式
+    console.log("tiaoxiu: currentDate:");
+    console.log(currentDate.toLocaleDateString());
+    const currentDateString = currentDate.toLocaleDateString();
+    const updateModifiedDate = {
+      ...datatoSend,
+      modifiedDate: currentDateString
+    }
+    setDatatoSend(updateModifiedDate);
     setDateText(currentDate.toDateString()); // 更新文本以显示选择的日期
   };
   const showMode = () => {
@@ -30,19 +61,55 @@ const ExchangeScreen = ({ navigation }) => {
   const [date1, setDate1] = useState(new Date());
   const [show1, setShow1] = useState(false);
   const [dateText1, setDateText1] = useState(date.toDateString());
+  const [myreplaceDate, setMyreplaceDate] = useState(initDateString);
 
   const onChange1 = (event, selectedDate) => {
     const currentDate1 = selectedDate || date1;
     setShow1(Platform.OS === 'ios');
     setDate1(currentDate1);
     //todo: 日期显示形式
+    console.log("tiaoxiu: currentDate1:");
+    console.log(currentDate1.toLocaleDateString());
+    const currentDate1String = currentDate1.toLocaleDateString();
+    if (eventType === "上课") {
+      const updateModifiedDate = {
+        ...datatoSend,
+        replaceDate: currentDate1String
+      };
+      setDatatoSend(updateModifiedDate);
+    }
     setDateText1(currentDate1.toDateString()); // 更新文本以显示选择的日期
+    setMyreplaceDate(currentDate1String);
   };
   const showMode1 = () => {
     setShow1(true);
   };
 
 const [eventType, setEventType] = useState('休假');
+
+  useEffect(() => {
+    console.log("tiaoxiu: eventType:");
+    console.log(eventType);
+    if (eventType === "休假") {
+      const updateModifiedDate = {
+        ...datatoSend,
+        replaceDate: ''
+      };
+      setDatatoSend(updateModifiedDate);
+    }
+    else if (eventType === "上课") {
+      const updateModifiedDate = {
+        ...datatoSend,
+        replaceDate: myreplaceDate
+      };
+      setDatatoSend(updateModifiedDate);
+    }
+  }, [eventType]);
+
+  useEffect(() => {
+    console.log("tiaoxiu: datatoSend:");
+    console.log(datatoSend);
+  }, [datatoSend]);
 
 
   return (

@@ -2,17 +2,24 @@ import React, { useState } from 'react';
 import { Modal, View, Text, TouchableOpacity, Button ,StyleSheet,ScrollView} from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 
-const TableSelectionModal = ({ isEdit,isVisible, onClose, onSelect }) => {
-  const [selectedType, setSelectedType] = useState(0);
+const EventRepeatSelectionModal = ({ isEdit,isVisible, onClose, onSelect, myrepeatType }) => {
+  const [selectedType, setSelectedType] = useState(myrepeatType);
 
   const toggleTypeSelection = (type) => {
     setSelectedType(type.id);
   };
 
   const handleDone = () => {
+      console.log("EventRepeatSelectionModal:selectedType:");
+      console.log(selectedType);
     onSelect(selectedType);
     onClose();
   };
+
+  const handleClose = () => {
+      setSelectedType(myrepeatType);
+      onClose();
+  }
 
   const  types=[{id:0,name:'不重复'}, {id:1,name:'每天'}, {id:2,name:'每周'}, {id:3,name:'每两周'}];
 
@@ -50,7 +57,7 @@ const TableSelectionModal = ({ isEdit,isVisible, onClose, onSelect }) => {
         </ScrollView>
 {/* todo：点击返回后再点击仍会显示刚才选过的 */}
           <View style={styles.buttonContainer}>
-            <TouchableOpacity onPress={onClose} style={styles.smallButton} >
+            <TouchableOpacity onPress={handleClose} style={styles.smallButton} >
                <Text style={{color:'white'}}>返回</Text>
             </TouchableOpacity>
             <TouchableOpacity onPress={handleDone} style={styles.smallButton} >
@@ -63,7 +70,7 @@ const TableSelectionModal = ({ isEdit,isVisible, onClose, onSelect }) => {
   );
 };
 
-export default TableSelectionModal;
+export default EventRepeatSelectionModal;
 
 const styles = StyleSheet.create({
 block:{

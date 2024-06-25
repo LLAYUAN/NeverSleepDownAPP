@@ -66,15 +66,15 @@ const ForgetSecretScreen = ({ navigation }) => {
 };
 
 const styles = StyleSheet.create({
-  container: {
-    height: '100%',
-    width: '100%',
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#F0F0F7',
-    position: 'relative'
-  },
+  // container: {
+  //   height: '100%',
+  //   width: '100%',
+  //   flex: 1,
+  //   justifyContent: 'center',
+  //   alignItems: 'center',
+  //   backgroundColor: '#F0F0F7',
+  //   position: 'relative'
+  // },
   block: {
     position: 'absolute',
     top: '25%',
@@ -127,14 +127,21 @@ const styles = StyleSheet.create({
     color: '#000F37',
   },
   container: {
-      flex: 1,
-      justifyContent: 'center',
-      alignItems: 'center',
+    height: '100%',
+    width: '100%',
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#F0F0F7',
+    position: 'relative',
+      //flex: 1,
+      //justifyContent: 'center',
+      //alignItems: 'center',
       padding: 20,
     },
     checkboxContainer: {
       justifyContent: 'center',
-      alignItems: 'center',
+      //alignItems: 'center',
       flexDirection: 'row',
       alignItems: 'center',
     },

@@ -4,20 +4,138 @@ import LinearGradient from 'react-native-linear-gradient';
 
 import { Picker } from '@react-native-picker/picker';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
+import axios from "axios";
+import AsyncStorage from "@react-native-community/async-storage";
 
-const TimeSettingScreen = ({ navigation }) => {
+const TimeSettingScreen = ({route, navigation }) => {
 
+  const {courseNum, courseTime, tableData, tableIdNow, tableNameNow} = route.params;
+
+  console.log("TimeSettingScreen:courseNum:");
+  console.log(courseNum);
+  console.log("TimeSettingScreen:courseTime:");
+  console.log(courseTime);
+  console.log("TimeSettingScreen:tableData:")
+  console.log(tableData);
+
+// 辅助函数，用于将时间字符串转换为小时、分钟、秒的数组
+  //const parseTime = (time) => {
+    // 假设时间格式总是像 "08:00:00" 这样，冒号分隔
+    //return time.split(':').map(n => parseInt(n, 10));
+  //};
+
+  /*const transformedArray = courseTime.map(item => ({
+    selectedStartTime: new Date(Date.parse(`${new Date(2024, 0, 1).toISOString().split('T')[0]}T${item.starttime}`)),
+    selectedEndTime: new Date(Date.parse(`${new Date(2024, 0, 1).toISOString().split('T')[0]}T${item.endtime}`)),
+    isStartTimePickerVisible: false,
+    isEndTimePickerVisible: false
+  }));*/
+  const parseTime = (time) => {
+    // 检查时间是否为非空字符串
+    if (time && typeof time === 'string') {
+      return time.split(':').map(n => parseInt(n, 10));
+    } else {
+      // 如果时间格式不正确或为null，则返回一个默认时间（例如：00:00:00）
+      console.error('Invalid time format:', time);
+      return [0, 0, 0]; // 这里只是一个示例，你应该根据实际情况返回合适的默认值
+    }
+  };
+
+  const transformedArray = courseTime.map(item => {
+    // 确保 item.startTime 和 item.endTime 是有效的字符串
+    const startTimeParts = parseTime(item.startTime);
+    const endTimeParts = parseTime(item.endTime);
+    return {
+      selectedStartTime: new Date(2024, 0, 1, ...startTimeParts),
+      selectedEndTime: new Date(2024, 0, 1, ...endTimeParts),
+      isStartTimePickerVisible: false,
+      isEndTimePickerVisible: false
+    };
+  });
+
+  // const transformedArray = courseTime.map(item => ({
+  //   selectedStartTime: new Date(2024, 0, 1, ...parseTime(item.startTime)),
+  //   selectedEndTime: new Date(2024, 0, 1, ...parseTime(item.endTime)),
+  //   isStartTimePickerVisible: false,
+  //   isEndTimePickerVisible: false
+  // }));
+
+  console.log("transformedArray");
+  console.log(transformedArray);
 //todo：处理保存逻辑
   const handleFinish = () => {
     // Implement your login logic here
-    navigation.goBack();
+    axios({
+      method: 'post',
+      url: 'http://192.168.116.144:8080/addTableInfo',
+      // url: 'https://mock.apifox.com/m1/4226545-3867488-default/addTableInfo',
+      // headers: {
+      //   'User-Agent': 'Apifox/1.0.0 (https://apifox.com)'
+      // },
+      data: finalTableDatatoSend
+    }).then(response => {
+      if (response.status === 200) {
+        console.log("SettingScreen: 录入工作表信息请求成功");
+      } else {
+        console.log("SettingScreen: 录入工作表信息请求失败");
+      }
+      //修改前端存储的个性化数据
+      axios({
+        method: 'post',
+        url: 'http://192.168.116.144:8080/switchTable',
+        // url: 'https://mock.apifox.com/m1/4226545-3867488-default/switchTable',
+        // headers: {
+        //     'User-Agent': 'Apifox/1.0.0 (https://apifox.com)'
+        // },
+        data: {
+          tableID: tableIdNow,
+          tableName: tableNameNow
+        }
+      }).then(response => {
+        if (response.data.code && response.data.data) {
+          console.log("back cookie:");
+          console.log(response.data.data.cookie);//确定后端cookie大写?
+          AsyncStorage.setItem('cookie', response.data.data.cookie);
+          AsyncStorage.setItem('tabledata', JSON.stringify(response.data.data));
+          console.log("修改cookie和tabledata");
+        } else {
+          console.error("Error: code is 0!");
+        }
+      }).catch(error => {
+        console.error('Error fetching data:', error);
+      });
+      navigation.reset({
+        index: 1,
+        routes: [{ name: 'Home' }, { name: 'Day' }],
+      });
+    }).catch(error => {
+      console.error('Error fetching data:', error);
+    });
   };
 
+
 //todo:获取当前工作表的节数和每节课的时间进行初始化
-  const [selectedWeek, setSelectedWeek] = useState(13);
+  const [selectedWeek, setSelectedWeek] = useState(courseNum? courseNum : 13);
   const weeks = Array.from({ length: 30 }, (_, i) => i + 1);
 
-  const [courses, setCourses] = useState([]);
+  //将courses数组转成要发送的格式
+  const convertCourses = (courses) => {
+    const tmpCourseTime = courses.map((course) => {
+      return {
+        startTime: course.selectedStartTime.toLocaleTimeString(),
+        endTime: course.selectedEndTime.toLocaleTimeString()
+      }
+    })
+    return tmpCourseTime;
+  }
+  const [courses, setCourses] = useState( transformedArray? transformedArray : []);
+  const [courseTimetoSend, setCourseTimetoSend] = useState([]);
+  useEffect(() => {
+    console.log("TimeSettingScreen: courses:");
+    console.log(courses);
+    const tmpcourseTimetoSend = convertCourses(courses);
+    setCourseTimetoSend(tmpcourseTimetoSend);
+  }, [courses]);
 
   useEffect(() => {
     // 当 selectedWeek 改变时，调整 courses 数组以匹配课程数
@@ -36,6 +154,20 @@ const TimeSettingScreen = ({ navigation }) => {
     }
     setCourses(newCourses);
   }, [selectedWeek]);
+
+  const [finalTableDatatoSend, setFinalTableDatatoSend] = useState(tableData);
+  useEffect(() => {
+    setFinalTableDatatoSend({
+      ...tableData,
+      courseNum: selectedWeek,
+      courseTime: courseTimetoSend
+    })
+  }, [selectedWeek, courseTimetoSend]);
+
+  useEffect(() => {
+    console.log("TimeSettingScreen: finalTableDatatoSend:");
+    console.log(finalTableDatatoSend);
+  }, [finalTableDatatoSend]);
 
   // 时间选择和隐藏处理
   const handlePickerVisibility = (index, type, isVisible) => {

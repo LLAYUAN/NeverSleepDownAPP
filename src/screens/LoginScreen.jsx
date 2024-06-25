@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-import { StyleSheet, View, TextInput, Button, Text,TouchableOpacity } from 'react-native';
+import {StyleSheet, View, TextInput, Button, Text, TouchableOpacity, Alert, Linking} from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import CheckBox from '@react-native-community/checkbox';
 
 import axios from 'axios';
 import AsyncStorage from "@react-native-community/async-storage";
-//const baseUrl = 'http://127.0.0.1:4523/m1/4226545-0-default/test';
+import getAndscheduleNotifications from "../service/getAndscheduleNotifications";
 
 
 const LoginScreen = ({ navigation }) => {
@@ -14,35 +14,52 @@ const LoginScreen = ({ navigation }) => {
   const [isSelected, setSelection] = useState(false);
 
 
-  const handleLogin = () => {
+  const handleLogin = async () => {
     console.log("handle login111");
     console.log(username);
     console.log(password);
     // Implement your login logic here
-    axios({
+    //axios.defaults.headers.common['Access-Control-Allow-Origin'] = '*';
+    await axios({
       method: 'post',
-      url: 'https://mock.apifox.com/m1/4226545-3867488-default/isPasswordCorrect',
-      headers: { 
-          'User-Agent': 'Apifox/1.0.0 (https://apifox.com)'
-      },
+      url: 'http://192.168.116.144:8080/isPasswordCorrect',
       data: {
         userID: username,
         password: password,
         isAutoLogin: isSelected
       }
     }).then(response => {
+      console.log("response.data:");
+      console.log(response.data);
       //console.log(JSON.stringify(response.data));
       if (response.data.code && response.data.data) {
-        console.log("cookies:");
-        console.log(response.data.data.cookie);
-        AsyncStorage.setItem('cookie', response.data.data.cookie);
-        console.log("tabledata:");
-        console.log(response.data.data);
-        AsyncStorage.setItem('tabledata', JSON.stringify(response.data.data));
-        console.log("isLogin:");
-        console.log(response.data.data.isLogin);
         if (response.data.data.isLogin) {
+          console.log("cookies:");
+          console.log(response.data.data.cookie);
+          AsyncStorage.setItem('cookie', response.data.data.cookie);
+          console.log("tabledata:");
+          console.log(response.data.data);
+          AsyncStorage.setItem('tabledata', JSON.stringify(response.data.data));
+          AsyncStorage.setItem('isFirstLogin', JSON.stringify(response.data.data.isFirstLogin));
+          AsyncStorage.setItem('course',JSON.stringify(false));
           navigation.navigate('Home');
+        } else {
+          console.log("isLogin = false!!!");
+          Alert.alert(
+              '登录失败', // 标题
+              '用户名或密码错误，请重试', // 内容
+              [
+                {
+                  text: '确定', // 按钮文本
+                  onPress: () => {
+                    // 用户点击确定后执行的操作
+                    setUsername(''); // 重置用户名输入框
+                    setPassword(''); // 重置密码输入框
+                  }
+                },
+              ],
+              { cancelable: false } // 禁止通过按返回键或点击遮罩来取消
+          );
         }
       } else {
         console.error("Error: code is 0!");
@@ -51,11 +68,24 @@ const LoginScreen = ({ navigation }) => {
       console.error('Error fetching data:', error);
     });
 
+    getAndscheduleNotifications();
+
    console.log("handle login222");
 
     //console.log('Username:', username, 'Password:', password, 'AutoLogin:', isSelected);
     //navigation.navigate('Home');
   };
+
+  const handleJacLogin = () => {
+    const clientId = 'ov3SLrO4HyZSELxcHiqS';
+    const redirectUri = encodeURIComponent('myapp://callback');
+    const responseType = 'code';
+    const state = 'xyz';
+    const authUrl = `https://jaccount.sjtu.edu.cn/oauth2/authorize?response_type=${responseType}&client_id=${clientId}&redirect_uri=${redirectUri}&state=${state}`;
+
+    console.log('Navigating to WebViewScreen with URL:', authUrl); // 添加日志
+    navigation.navigate('WebViewScreen', { url: authUrl });
+  }
 
   return (
   <LinearGradient colors={['#72C4FF', '#FF9E9E']} style={styles.container}>
@@ -101,7 +131,7 @@ const LoginScreen = ({ navigation }) => {
       </View>
 
       </View>
-        <TouchableOpacity onPress={() => navigation.navigate('jaccount')} style={styles.jaccontaner}>
+        <TouchableOpacity onPress={handleJacLogin} style={styles.jaccontaner}>
            <Text style={styles.footerText}>Jaccount 登录</Text>
         </TouchableOpacity>
     </LinearGradient>

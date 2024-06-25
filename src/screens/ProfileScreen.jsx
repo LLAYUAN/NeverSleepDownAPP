@@ -1,26 +1,92 @@
-import React, { useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import { Modal,Image,StyleSheet, View, TextInput, Button, Text,TouchableOpacity,ActionSheetAndroid } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import { Picker } from '@react-native-picker/picker';
+import axios from "axios";
+import AsyncStorage from "@react-native-community/async-storage";
 
 
 const ProfileScreen = ({ navigation }) => {
+  const [isUserInfoReady, setIsUserInfoReady] = useState(false);
+  //todo:从后端获取用户信息进行初始化
+  const [userId, setUserId] = useState('');
+  const [name, setName] = useState('');
+  const [gender, setGender] = useState('');
+  const [location, setLocation] = useState('');
+
+  useEffect(() => {
+    console.log("ProfileScreen: name:");
+    console.log(name);
+  }, [name]);
+
+  useEffect(() => {
+    console.log("ProfileScreen: gender:");
+    console.log(gender);
+  }, [gender]);
+
+  useEffect(() => {
+    console.log("ProfileScreen: gender:");
+    console.log(location);
+  }, [location]);
+
+  useEffect(() => {
+      axios({
+        method: 'get',
+        url: 'http://192.168.116.144:8080/getUserInfo',
+        // url: 'https://mock.apifox.com/m1/4226545-3867488-default/getUserInfo',
+        // headers: {
+        //   'User-Agent': 'Apifox/1.0.0 (https://apifox.com)'
+        // }
+      }).then(response => {
+        //console.log(JSON.stringify(response.data));
+        console.log("run getuserinfo:")
+        if (response.data.code && response.data.data) {
+          setUserId(response.data.data.userID);
+          setName(response.data.data.userName);
+          setGender(response.data.data.userGender === true? '女' : '男');
+          setLocation(response.data.data.userLocation);
+          setIsUserInfoReady(true);
+        } else {
+          console.error("Error: code is 0!");
+        }
+      }).catch(error => {
+        console.error('Error fetching data:', error);
+      });
+  }, []);
 
 //todo：处理保存逻辑
   const handleFinish = () => {
     // Implement your login logic here
+    axios({
+      method: 'post',
+      url: 'http://192.168.116.144:8080/addUserInfo',
+      // url: 'https://mock.apifox.com/m1/4226545-3867488-default/addUserInfo',
+      // headers: {
+      //   'User-Agent': 'Apifox/1.0.0 (https://apifox.com)'
+      // },
+      data: {
+        userName: name,
+        userGender: gender==='男' ? false : true,
+        userLocation: location,
+        avatarURL: ''
+      }
+    }).catch(error => {
+      console.error('Error fetching data:', error);
+    });
+    console.log("ProfileScreen:finish:");
+    console.log("send data:");
+    console.log(name);
+    console.log(gender);
+    console.log(location);
     navigation.navigate('Home');
   };
 
-//todo:从后端获取用户信息进行初始化
-  const [userId, setUserId] = useState('188888888888');
-  const [name, setName] = useState('12321hh');
-  const [gender, setGender] = useState('女');
-  const [location, setLocation] = useState('上海');
-
-
 //todo:处理更改头像逻辑
   const handleUploadImg=()=>{}
+
+  if (!isUserInfoReady) {
+    return <Text>Loading...</Text>;
+  }
 
   return (
   <LinearGradient colors={['#72C4FF80', '#FF9E9E80']} style={styles.container}>
@@ -38,7 +104,7 @@ const ProfileScreen = ({ navigation }) => {
       </TouchableOpacity>
 
     <View style={styles.selectContainer}>
-      <Text style={styles.titleText}>账户名</Text>
+      <Text style={styles.titleText}>用户名</Text>
       <TextInput
         editable={false}
         style={styles.input}
@@ -52,12 +118,12 @@ const ProfileScreen = ({ navigation }) => {
       <Text style={styles.titleText}>昵称</Text>
       <TouchableOpacity style={styles.select}>
       <TextInput
-        style={styles.input}
+          style={[styles.input,{width:120,marginRight:30,textAlign: 'right'}]}
         placeholder="昵称"
         onChangeText={setName}
         value={name}
       />
-      <Image source={require('../image/select.png')} style={styles.icon}/>
+      {/*<Image source={require('../image/select.png')} style={styles.icon}/>*/}
       </TouchableOpacity>
     </View>
 
@@ -77,23 +143,27 @@ const ProfileScreen = ({ navigation }) => {
       <Text style={styles.titleText}>属地</Text>
       <TouchableOpacity style={styles.select}>
       <TextInput
-        style={styles.input}
+          style={[styles.input,{width:120,marginRight:30,textAlign: 'right'}]}
         placeholder="属地"
         onChangeText={setLocation}
         value={location}
       />
-      <Image source={require('../image/select.png')} style={styles.icon}/>
+      {/*<Image source={require('../image/select.png')} style={styles.icon}/>*/}
       </TouchableOpacity>
     </View>
 
     <View style={{height:70}}/>
       <View style={styles.buttonContainer}>
-        <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('ChangeSecret')}>
+        <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('ChangeSecret', {userID: userId})}>
             <Text style={styles.buttonText}>修改密码</Text>
         </TouchableOpacity>
       </View>
       <View style={styles.buttonContainer}>
-        <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Login')}>
+        <TouchableOpacity style={styles.button} onPress={() => navigation.reset({
+          index: 1,
+          routes: [{ name: 'Login' }],
+        })
+        }>
             <Text style={styles.buttonText}>退出登录</Text>
         </TouchableOpacity>
       </View>

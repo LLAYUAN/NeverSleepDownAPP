@@ -7,7 +7,7 @@ import { format, startOfWeek, endOfWeek, eachDayOfInterval, addDays, subWeeks, a
 import {response} from "../../.yarn/releases/yarn-1.22.22";
 import axios from "axios";
 
-export default function WeekCalendarScreen({ navigation }){
+export default function WeekCalendarScreen({navigation }){
 /*
     示例格式
     const arrtest = [
@@ -30,7 +30,9 @@ export default function WeekCalendarScreen({ navigation }){
         weekday: 3
     }
 ];*/
-
+    useEffect(() => {
+        console.log("WeekCalendarScreen:");
+    }, []);
 const [selectedDate, setSelectedDate] = useState(new Date());
 const [currentWeekStart, setCurrentWeekStart] = useState(startOfWeek(new Date(), { weekStartsOn: 1 }));
 
@@ -76,7 +78,7 @@ const getWeekDays = (date) => {
     const convertTimeToFloat = (time) => {
         //console.log("run convertTimeToFloat");
         // 分割字符串以获取小时和分钟
-        const [hours, minutes] = time.split(':');
+        const [hours, minutes, seconds] = time.split(':');
         // 将分钟转换为浮点数，以便可以表示如 9.5 这样的时间
         const timeFloat = parseFloat(hours) + parseFloat(minutes) / 60;
         return timeFloat;
@@ -94,6 +96,8 @@ const getWeekDays = (date) => {
         date: event.date
     });
 
+
+
     //selectedDate一变就重新调用
     useEffect(() => {
         //先清空
@@ -104,7 +108,7 @@ const getWeekDays = (date) => {
 
         // 创建一个数组，存储每一天的请求 Promise
         const requests = weekDates.map(day =>
-            axios.post('https://mock.apifox.com/m1/4226545-3867488-default/loadDayVision', {
+            axios.post('http://192.168.116.144:8080/loadDayVision'/*'https://mock.apifox.com/m1/4226545-3867488-default/loadDayVision'*/, {
                 date: day
             })
         );
@@ -124,15 +128,19 @@ const getWeekDays = (date) => {
                     console.log(weekday);
                     console.log(weekdate);
                     //set weeknow
+                    console.log("WeekCalendarScreen: weeknow:");
+                    console.log(response.data.weeknow);
                     setWeeknow(response.data.weeknow);
-                    response.data.eventArr.forEach(event => {
-                        // 为每个事件添加 weekday 属性
-                        acc.push({
-                            ...event,
-                            weekday: weekday,
-                            date: weekdate
+                    if (response.data.eventArrs) {
+                        response.data.eventArrs.forEach(event => {
+                            // 为每个事件添加 weekday 属性
+                            acc.push({
+                                ...event,
+                                weekday: weekday,
+                                date: weekdate
+                            });
                         });
-                    });
+                    }
                     return acc;
                 }, []);
 

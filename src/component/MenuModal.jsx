@@ -1,15 +1,108 @@
-import React, { useState } from 'react';
-import { TouchableWithoutFeedback,Modal, Image,View, Text, TouchableOpacity, Button ,StyleSheet,ScrollView} from 'react-native';
+import React, {useEffect, useState} from 'react';
+import {
+    TouchableWithoutFeedback,
+    Modal,
+    Image,
+    View,
+    Text,
+    TouchableOpacity,
+    Button,
+    StyleSheet,
+    ScrollView,
+    Alert
+} from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import TableSelectionModal from './TableSelectionModal';
+import AsyncStorage from "@react-native-community/async-storage";
+import { generatePDF } from '../service/share';
+import axios from "axios";
 
 const MenuModal = ({ navigation,isVisible, onClose}) => {
   const [modalTableVisible, setModalTableVisible] = useState(false);
+    // 新增状态来存储从 AsyncStorage 读取的数据
+    /*const [storageData, setStorageData] = useState({
+        tableID: 0,
+        tableName: '',
+        isLoading: true, // 表示数据是否正在加载
+    });
+    useEffect(() => {
+        console.log("MenuModal: useEffect:");
+        AsyncStorage.getItem('tabledata', (error, result) => {
+            if (error) {
+                // 处理读取错误
+                console.error('读取错误:', error);
+            } else {
+                // result 是一个字符串，可能需要转换或解析
+                console.log('读取的数据:', result);
+                // 如果数据是 JSON 格式，需要解析它
+                const parsedData = JSON.parse(result);
+                // 使用解析后的数据
+                setStorageData({
+                    tableID: parsedData.tableID,
+                    tableName: parsedData.tableName,
+                    isLoading: false, // 数据已加载
+                })
+            }
+        });
+    }, []);
+    const { tableID, tableName, isLoading } = storageData;*/
+    //if (isLoading) return <Text>Loading...</Text>
 
-//todo:更新选择的工作表
-  handleSelectTable = () => {
+//todo:更新选择的工作表 没必要在这加啊
+//   const handleSelectTable = () => {
+//
+//   };
+    const handleExport = async () => {
+        let courses = [];
+        await axios({
+            method: 'get',
+            url: 'http://192.168.116.144:8080/export',
+        }).then(response => {
+            console.log("MenuModal: handleExport: response.data:");
+            console.log(response.data);
+            courses = response.data.courses;
+        }).catch(error => {
+            console.error('Error fetching data:', error);
+        });
+        if (!courses) {
+            Alert.alert(
+                '导出失败', // 标题
+                '课表为空', // 内容
+                [
+                    {
+                        text: '确定', // 按钮文本
+                    },
+                ],
+                { cancelable: false } // 禁止通过按返回键或点击遮罩来取消
+            );
+        } else {
+            generatePDF(courses);
+        }
+        onClose();
+    }
 
-  };
+    const handleImport = async () => {
+        Alert.alert('提示', '正在导入...', [], { cancelable: false }); // 显示提示框
+        const accessToken = await AsyncStorage.getItem('accessToken');
+        console.log("handleImport:accessToken:");
+        console.log(accessToken);
+        if (accessToken) {
+            await axios({
+                method: 'get',
+                url: `http://192.168.116.144:8080/RequestLesson?accessToken=${accessToken}`,
+            }).then(response => {
+                console.log("MenuModal: handleImport");
+            }).catch(error => {
+                console.error('Error fetching data:', error);
+            });
+        }
+        Alert.alert('提示', '导入成功', [{ text: '确定' }], { cancelable: false });
+        onClose();
+        navigation.reset({
+            index: 1,
+            routes: [{ name: 'Home' }, { name: 'Day' }],
+        });
+    }
 
   return (
     <Modal
@@ -22,7 +115,7 @@ const MenuModal = ({ navigation,isVisible, onClose}) => {
         <View style={styles.modalOverlay}>
           <TouchableWithoutFeedback onPress={() => {}}>
              <View style={styles.block}>
-                <TouchableOpacity onPress={() => {onClose();navigation.navigate('Import')}} style={styles.buttonContainer}>
+                <TouchableOpacity onPress={handleImport} style={styles.buttonContainer}>
                     <Image source={require('../image/import.png')} style={styles.icon}/>
                     <Text style={styles.buttonText}>导入</Text>
                 </TouchableOpacity>
@@ -41,8 +134,8 @@ const MenuModal = ({ navigation,isVisible, onClose}) => {
                     navigation={navigation}
                     isVisible={modalTableVisible}
                     onClose={() => {onClose();setModalTableVisible(false)}}
-                    onSelect={handleSelectTable}
-                    defaultTable="工作表1"
+                    //onSelect={handleSelectTable}
+                    //defaultTable={tableName}
                   />
 
                 <TouchableOpacity onPress={() => {onClose();navigation.navigate('Tiaoxiu')}} style={styles.buttonContainer}>
@@ -50,7 +143,7 @@ const MenuModal = ({ navigation,isVisible, onClose}) => {
                     <Text style={styles.buttonText}>调 休</Text>
                 </TouchableOpacity>
 
-                <TouchableOpacity onPress={() => {onClose();navigation.navigate('Export')}} style={styles.buttonContainer}>
+                <TouchableOpacity onPress={handleExport} style={styles.buttonContainer}>
                     <Image source={require('../image/export.png')} style={styles.icon}/>
                     <Text style={styles.buttonText}>导 出</Text>
                 </TouchableOpacity>
@@ -65,11 +158,18 @@ const MenuModal = ({ navigation,isVisible, onClose}) => {
                     <Text style={styles.buttonText}>账 户</Text>
                 </TouchableOpacity>
 
+                 {/* update */}
+                 <TouchableOpacity onPress={() => {onClose();navigation.navigate('Notes')}} style={styles.buttonContainer}>
+                     <Image source={require('../image/note.png')} style={styles.icon}/>
+                     <Text style={styles.buttonText}>笔 记</Text>
+                 </TouchableOpacity>
+
                 <View style={{height:15}}></View>
              </View>
           </TouchableWithoutFeedback>
         </View>
       </TouchableWithoutFeedback>
+
     </Modal>
   );
 };
@@ -107,9 +207,9 @@ const styles = StyleSheet.create({
         fontSize:20,
         fontWeight:'bold',
     },
-    icon:{
-        width:25,
-        height:25,
+    icon: {
+        width: 25,
+        height: 25,
     }
 
 });

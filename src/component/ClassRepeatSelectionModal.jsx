@@ -2,8 +2,10 @@ import React, { useState,useEffect } from 'react';
 import { Modal, View, Text, TouchableOpacity, Button ,StyleSheet} from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 
-const ClassRepeatSelectionModal = ({ isEdit,isVisible, onClose, onSelect }) => {
-  const [selectedClasses, setSelectedClasses] = useState([]);
+const ClassRepeatSelectionModal = ({ isEdit,isVisible, onClose, onSelect, weekNum, initSelectedClass }) => {
+    console.log("initSelectedClass:");
+    console.log(initSelectedClass);
+  const [selectedClasses, setSelectedClasses] = useState(initSelectedClass);
   const [type, setType] = useState(0);//0是随机，1是全部，2是单周，3是双周
 
   const toggleClassSelection = (classNumber) => {
@@ -44,6 +46,8 @@ const ClassRepeatSelectionModal = ({ isEdit,isVisible, onClose, onSelect }) => {
           setType(3);
         }
     }
+    console.log("ClassRepeatSelectionModal:");
+    console.log(selectedClasses);
   }, [selectedClasses]);
 
   const handleDone = () => {
@@ -55,7 +59,7 @@ const ClassRepeatSelectionModal = ({ isEdit,isVisible, onClose, onSelect }) => {
     if(type===1){
     setSelectedClasses([]);
     }else{
-    setSelectedClasses(Array.from({ length: 16 }, (_, i) => i + 1));
+    setSelectedClasses(Array.from({ length: weekNum }, (_, i) => i + 1));
     }
   };
 
@@ -63,7 +67,11 @@ const ClassRepeatSelectionModal = ({ isEdit,isVisible, onClose, onSelect }) => {
     if(type===2){
     setSelectedClasses([]);
     }else{
-    setSelectedClasses(Array.from({ length: 8 }, (_, i) => i * 2 + 1));
+        if (weekNum % 2 === 0) {
+            setSelectedClasses(Array.from({ length: weekNum/2 }, (_, i) => i * 2 + 1));
+        } else {
+            setSelectedClasses(Array.from({ length: (weekNum/2) + 1 }, (_, i) => i * 2 + 1));
+        }
     }
   };
 
@@ -71,12 +79,18 @@ const ClassRepeatSelectionModal = ({ isEdit,isVisible, onClose, onSelect }) => {
     if(type===3){
     setSelectedClasses([]);
     }else{
-    setSelectedClasses(Array.from({ length: 8 }, (_, i) => i * 2 + 2));
+    setSelectedClasses(Array.from({ length: weekNum/2 }, (_, i) => i * 2 + 2));
     }
   };
 
+  const handlePressBack = () => {
+      setSelectedClasses(initSelectedClass);
+      onClose();
+  }
+
 //获取课程周数
-  const week = Array.from({ length: 16 }, (_, i) => i + 1); // 创建一个包含16个课程号的数组
+// const weekNum = 15;//weekNum是要传进来的
+  const week = Array.from({ length: weekNum }, (_, i) => i + 1); // 创建一个包含16个课程号的数组
 
   return (
     <Modal
@@ -124,7 +138,7 @@ const ClassRepeatSelectionModal = ({ isEdit,isVisible, onClose, onSelect }) => {
           </View>
 {/* todo：点击返回后再点击仍会显示刚才选过的 */}
           <View style={styles.buttonContainer}>
-            <TouchableOpacity onPress={onClose} style={styles.smallButton} >
+            <TouchableOpacity onPress={handlePressBack} style={styles.smallButton} >
                <Text style={{color:'white'}}>返回</Text>
             </TouchableOpacity>
             <TouchableOpacity onPress={handleDone} style={styles.smallButton} >
